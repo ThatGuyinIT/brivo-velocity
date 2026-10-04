@@ -1,0 +1,91 @@
+# Brivo Access API - Documentation for LLMs
+# https://apidocs.brivo.com/access/llms.txt
+# Generated: 2026-09-28
+
+> This file covers the Brivo Access API only (doors, credentials, events, users).
+> API runtime base URL (where API requests go, NOT where these docs live): https://api.brivo.com (regional variants in api-overview.md)
+> Total endpoints: 153
+> Documentation files are public and require no authentication. A 403 means the path is wrong.
+
+## Step 1 - Read the context file first (MANDATORY)
+
+https://apidocs.brivo.com/access/access-api-context.yaml
+
+API overview, authentication info, and complete endpoint list grouped by tag.
+MANDATORY: Read this file before fetching ANY reference file. The context file
+is the only source of truth for reference filenames. It is sufficient for most
+tasks on its own.
+
+## Step 2 - Fetch a reference file (only when implementing)
+
+Only fetch a reference file when implementing against a specific tag's
+endpoints. The context file alone answers most questions (endpoint lists,
+auth, conventions) - do not fetch references for exploratory questions.
+
+The context file's `tags[].file` field gives the exact path for each
+tag's reference file, relative to this access/ directory. To fetch one,
+read that field and resolve it as `https://apidocs.brivo.com/access/<file>`. Filenames
+are NOT derivable from tag names alone - never construct a path; copy it
+from the context file.
+
+Each reference file is a self-contained OpenAPI 3.1 document covering one
+tag's endpoints, parameters, request bodies, response schemas, and examples.
+
+## Step 3 - Fetch the API conventions overview if needed
+
+https://apidocs.brivo.com/access/api-overview.md
+
+Base URLs, authentication, schema conventions, paging, and error codes.
+Only needed if Step 1 does not answer your conventions question.
+
+## Browser / SPA Integration
+
+Browser-based apps cannot call auth.brivo.com or api.brivo.com directly due to
+CORS restrictions. Use a dev-server proxy (e.g., Vite, webpack) that rewrites
+paths so the local routing prefix is stripped before forwarding:
+
+| Local prefix | Target | Example |
+| --- | --- | --- |
+| `/auth` | https://auth.brivo.com | `/auth/oauth/token` -> `https://auth.brivo.com/oauth/token` |
+| `/api` | https://api.brivo.com  | `/api/v1/api/sites` -> `https://api.brivo.com/v1/api/sites` |
+
+## Filter Syntax (applies to every `filter=` query parameter)
+
+Format: `<field>__<op>:<value>[,<value>...]`
+
+- Operators: `eq`, `ne`, `gt`, `lt`
+- Multiple values for one filter: comma-separated (`id__eq:11,22,33`)
+- Multiple filters in one request: semicolon-separated (`site__eq:111;occurred__gt:2024-01-01T00:00:00Z`)
+
+Common mistakes that return `400 "Invalid filter format"`:
+
+- Using a single `:` between field and operator (`site:eq:111`) instead of `__` (`site__eq:111`)
+- Joining filters with `,` instead of `;`
+
+Per-tag reference files list available filter fields and per-field constraints
+(for example, `occurred` on `/events/access` is capped to a 24-hour window),
+but the syntax above is universal across the Access API.
+
+## Token Lifetime and Refresh
+
+The `access_token` returned by the password grant expires in **300 seconds**.
+This is short enough that any multi-call flow (login -> list sites -> list
+events) will outlive a single token. Refresh is mandatory, not optional.
+
+Required client behavior:
+
+1. Persist the `refresh_token` returned alongside `access_token`.
+2. Refresh proactively before `expires_in` elapses, OR retry once on
+   `401 {"error":"invalid_token"}` using `grant_type=refresh_token`.
+3. Only force the user to re-authenticate if the refresh request itself fails.
+
+Refresh request:
+
+```http
+POST https://auth.brivo.com/oauth/token
+Authorization: Basic {BASE64_ENCODED_CLIENT_CREDENTIALS}
+api-key: {api-key}
+Content-type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token={REFRESH_TOKEN}
+```

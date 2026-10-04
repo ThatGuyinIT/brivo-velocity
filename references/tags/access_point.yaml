@@ -1,0 +1,696 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Access_Point endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging,
+    and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Access_Point
+paths:
+  /access-points:
+    get:
+      operationId: ListAccessPoints
+      summary: Access Point Listing
+      description: Retrieve a listing of access points which the current user has view permissions for.
+      tags:
+        - Access_Point
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The count of where to start the requested Page
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page, default size is 20 and max size is 100.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are  name  Filters based on
+            an access point's name Allowed operators  eq: includes any access point with a name that contains the
+            provided name value     report_live_status  Filters based on live status value Allowed operators  eq: "true"
+            includes any access point where the live status is true. "false" includes any access points where the live
+            status is null or false. NOTE: Live status is only supported for 6k and 300 panels.     serial_number 
+            Filters based on offline lock serial numbers Allowed operators:  eq: includes only access points that match
+            the provided value or comma-separated list of values     access_point_types  Filters based on access point
+            type Allowed operators:  eq: includes only access points whose type matches one of the provided
+            comma-separated type names (e.g. DOOR, SALTO_DOOR). An unknown type name returns a 400 Bad Request.  
+            Accepted values:  DOOR FLOOR SALTO_DOOR ALLEGION_DOOR ASSA_ABLOY_DOOR OFFLINE_DOOR SIMONS_VOSS_LOCK
+            YONOMI_LOCK
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+                    data:
+                      - id: 111111
+                        name: Front door
+                        type: Door
+                        controlPanelId: 1111
+                        siteId: 11111
+                        siteName: Site 1
+                        activationEnabled: true
+                        twoFactorEnabled: true
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+  /access-points/{accessPointId}:
+    get:
+      operationId: GetAccessPoint
+      summary: Access Point Retrieval
+      description: Retrieve an Access Point based on the id.
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the accesspoint
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 111111
+                    name: Front door
+                    controlPanelId: 1111
+                    siteId: 11111
+                    siteName: Site 1
+                    activationEnabled: true
+                    twoFactorEnabled: true
+                    unlockScheduleId: 333333
+                    unlockScheduleName: 9 to 5 Schedule
+                    unlockScheduleEnablingGroupId: 555555
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+  /access-points/{accessPointId}/activate:
+    post:
+      operationId: ActivateAccessPoint
+      summary: Access Point Activation
+      description: >-
+        Unlocks an Access Point at the Administrators request.
+
+
+        - Administrator must have permission to unlock the access-point
+
+        - Access Point must be enabled for activation.
+
+        - To enable or disabled activation navigate to the related Door in Account Config Tool and check the Control
+        From Browser field.
+
+
+
+
+
+        For the most common use case this results in a Door opening. Only Access Points which have an Activation Enabled
+        value of true can be activated via the api. To enable this navigate to a Door in Account Config Tool and check
+        the Control From Browser field.
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the accesspoint
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+        '412':
+          description: Precondition failed, the specified access point is not connected
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: Access point is not connected
+  /access-points/{accessPointId}/activateElevator:
+    post:
+      operationId: ActivateElevator
+      summary: Elevator Activation
+      description: |-
+        Unlocks an Elevator the Administrators request.
+
+        - Administrator must have permission to unlock the elevator
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the accesspoint
+          schema:
+            type: number
+        - name: targetDevices
+          in: query
+          required: true
+          description: the OID of floor devices
+          schema:
+            type: array
+            items:
+              type: string
+              x-apidoc-original-type: Long
+      responses:
+        '200':
+          description: 'Success-Response:'
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+        '412':
+          description: Precondition failed, the specified access point is not connected
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: Access point is not connected
+  /access-points/{accessPointId}/cameras:
+    get:
+      operationId: ListCamerasAccessPoint
+      summary: List Cameras for Access Point
+      description: List cameras for provided access point id
+      tags:
+        - Access_Point
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+        - name: accessPointId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 8675308
+                        name: Camera 1 East Side
+                        site:
+                          id: 8675309
+                          siteName: Acme West Site
+                      - id: 9037686
+                        name: Camera 2 West Side
+                        site:
+                          id: 8675309
+                          siteName: Acme West Site
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+  /access-points/{accessPointId}/groups:
+    get:
+      operationId: ListGroupsAccessPoint
+      summary: List Groups for Access Point
+      description: |-
+        List groups for provided access point id
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Access_Point
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+        - name: accessPointId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+                    data:
+                      - id: 442211
+                        name: Staff
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+  /access-points/{accessPointId}/unlock:
+    post:
+      operationId: RequestUnlockAccessPoint
+      summary: Unlock Access Point
+      description: >-
+        Sends a request to unlock an access-point.
+
+
+        - The request will be granted if the card holder has permission to access this door based on their groups
+        affiliation.
+
+        - Available only to digital credential users
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the accesspoint
+          schema:
+            type: number
+      responses:
+        '204':
+          description: 'Success-Response:'
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+        '412':
+          description: Precondition failed, the specified access point is not connected
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: Access point is not connected
+  /device-status/{accessPointId}:
+    get:
+      operationId: Live_Status
+      summary: Live Status
+      description: Retrieve live status information for an access point
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    accessPointName: Front Door
+                    statusUpdated: '2020-04-17T18:23:52Z'
+                    siteName: HQ Site
+                    siteTimezone: US/Eastern
+                    panelName: Panel THB-XJ-YYBIR
+                    panelCpNumber: THB-XJ-YYBIR
+                    canPanelSupportScheduleOverride: true
+                    unlockSchedule:
+                      id: 1111
+                      name: 9-5 Monday-Friday
+                      isScheduleBlockActive: true
+                      nextTimeChange: '2020-04-17T21:00:00Z'
+                    scheduleOverride:
+                      endTimeMode: UNTIL_TIME
+                      behavior: UNLOCK
+                      endTime: '2020-04-18T00:00:00Z'
+                    accessPointScheduledState: UNLOCKED
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+  /schedules/change-state/{accessPointId}:
+    post:
+      operationId: Door_Override
+      summary: Door Override
+      description: >-
+        Temporarily overrides the Schedule State of an access point
+
+
+        - This override takes precedence over schedules, holidays, and schedule exceptions, but not lockdown.
+
+        - While an override is in effect, administrators will not be unable to change the access point's unlock schedule
+        or edit the schedule itself.
+
+        - An access point may only have one override at a time.
+
+        - If live status reporting is not yet enabled for this access point, it will be enabled.
+
+        - After successfully setting an override, this endpoint will wait up to 10 seconds to retrieve the updated
+        access point status after setting a door override, at which point the response will include the value of
+        `accessPointState` as `UNKNOWN`. The most recent status can be retrieved using the Access Point Live Status
+        (#api-Access_Point-Live_Status) endpoint.
+
+        - This action is only available to Brivo Account Config Tool Administrators
+
+        - Assistant Administrators must have view and edit permissions to a site to change the schedule state of the
+        associated access point
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the access point
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    accessPointName: Front Door
+                    statusUpdated: '2020-04-17T18:23:52Z'
+                    siteName: HQ Site
+                    siteTimezone: US/Eastern
+                    panelName: Panel THB-XJ-YYBIR
+                    panelCpNumber: THB-XJ-YYBIR
+                    canPanelSupportScheduleOverride: true
+                    unlockSchedule:
+                      id: 1111
+                      name: 9-5 Monday-Friday
+                      isScheduleBlockActive: true
+                      nextTimeChange: '2020-04-17T21:00:00Z'
+                    scheduleOverride:
+                      endTimeMode: UNTIL_TIME
+                      behavior: UNLOCK
+                      endTime: '2020-04-18T00:00:00Z'
+                    accessPointScheduledState: UNLOCKED
+        '400':
+          description: >-
+            Bad Request, the provided door override is invalid or contains field values invalid for the specified access
+            point
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Cannot use mode UNTIL_NEXT_SCHEDULE_CHANGE; This door does not have an unlock schedule.
+        '403':
+          description: Forbidden, you do not have permission to change the schedule state of this access point
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Access to the requested resource was denied
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+        '412':
+          description: Precondition failed, the access point does not support overrides or one is already in effect
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: This door already has a schedule override
+        '417':
+          description: >-
+            Expectation failed, setting the override failed due to an offline control panel or network communication
+            error
+          content:
+            application/json:
+              examples:
+                '417 Error-Response:':
+                  value:
+                    code: 417
+                    message: Could not reach device to send it your schedule override.
+    delete:
+      operationId: Door_Override_Cancel
+      summary: Door Override Cancel
+      description: >-
+        Cancels an override to the Schedule State of an access point.
+
+
+        - After successfully canceling an override, this endpoint will wait up to 10 seconds to retrieve the updated
+        access point status after setting a door override, at which point the response will include the value of
+        `accessPointState` as `UNKNOWN`. The most recent status can be retrieved using the Access Point Live Status
+        (#api-Access_Point-Live_Status) endpoint.
+      tags:
+        - Access_Point
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the access point
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    accessPointName: Front Door
+                    statusUpdated: '2020-04-17T18:23:52Z'
+                    siteName: HQ Site
+                    siteTimezone: US/Eastern
+                    panelName: Panel THB-XJ-YYBIR
+                    panelCpNumber: THB-XJ-YYBIR
+                    canPanelSupportScheduleOverride: true
+                    unlockSchedule:
+                      id: 1111
+                      name: 9-5 Monday-Friday
+                      isScheduleBlockActive: true
+                      nextTimeChange: '2020-04-17T21:00:00Z'
+                    scheduleOverride:
+                      endTimeMode: UNTIL_TIME
+                      behavior: UNLOCK
+                      endTime: '2020-04-18T00:00:00Z'
+                    accessPointScheduledState: UNLOCKED
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Access point not found
+        '412':
+          description: Precondition failed, the access point does not support overrides or there is not currently one in effect
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: This door does not have a schedule override
+        '417':
+          description: >-
+            Expectation failed, canceling the override failed due to an offline control panel or network communication
+            error
+          content:
+            application/json:
+              examples:
+                '417 Error-Response:':
+                  value:
+                    code: 417
+                    message: Could not reach device to cancel your schedule override.
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

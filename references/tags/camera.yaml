@@ -1,0 +1,316 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Camera endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Camera
+paths:
+  /cameras:
+    get:
+      operationId: CamerasList
+      summary: Camera Listing
+      description: Retrieve a listing of cameras.
+      tags:
+        - Camera
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are  name  Filters based on a
+            camera's name Allowed operators  eq: includes any camera with a name that contains the provided name value
+          schema:
+            type: string
+            x-apidoc-original-type: text
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 8675309
+                        name: Back Door Camera
+                        videoProvider:
+                          type: EAGLE_EYE
+                        site:
+                          id: 789342
+                          siteName: Acme West Site
+                      - id: 8675319
+                        name: Side Door Camera
+                        videoProvider:
+                          type: EAGLE_EYE_CAMERA_MANAGER
+                        site:
+                          id: 789342
+                          siteName: Acme West Site
+                      - id: 903768
+                        name: Front Door Camera
+                        videoProvider:
+                          type: ONAIR
+                          version: '2.22'
+                        site:
+                          id: 789342
+                          siteName: Acme West Site
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '400':
+          description: Bad Request, Invalid listing criteria specified
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+  /cameras/{cameraId}:
+    get:
+      operationId: RetrieveCamera
+      summary: Camera Retrieval
+      description: Retrieve a camera based on its id
+      tags:
+        - Camera
+      parameters:
+        - name: cameraId
+          in: path
+          required: true
+          description: The id for camera to find
+          schema:
+            type: number
+        - name: showStatus
+          in: query
+          required: false
+          description: Request camera status with the camera retrieval.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 9486127
+                    name: Front door camera
+                    liveViewUrl: https://acme.cameras.com/1
+                    videoProvider:
+                      type: EAGLE_EYE
+                    site:
+                      id: 321
+                      siteName: Acme West Site
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified camera was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Camera not found
+  /cameras/{cameraId}/access-points:
+    get:
+      operationId: ListCameraAccessPoints
+      summary: Camera Access Point Listing
+      description: Retrieve a listing of camera's access points based on its id
+      tags:
+        - Camera
+      parameters:
+        - name: cameraId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 311324
+                        name: Side Door
+                        controlPanelId: 301913
+                        siteId: 271500
+                        siteName: Acme West Site
+                        activationEnabled: true
+                      - id: 311325
+                        name: Server Room 1
+                        controlPanelId: 301913
+                        siteId: 271500
+                        siteName: Acme West Site
+                        activationEnabled: false
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '400':
+          description: Bad Request, Invalid listing criteria specified
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified camera was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Camera not found
+  /cameras/{cameraId}/video:
+    get:
+      operationId: CameraVideoClipList
+      summary: Camera Video Clip Listing
+      description: >-
+        Retrieve a listing of camera video clips.
+
+
+        Video clips are captured and stored by Brivo when specific access-related event types occur at a device
+        associated with the camera (for example, an access granted or door ajar event). Only these stored clips are
+        returned by this endpoint. Camera-generated events such as Motion or Object Line Crossing do not produce clips
+        retrievable through this API. An empty videoClips array means no clips are available for the requested time
+        range.
+      tags:
+        - Camera
+      parameters:
+        - name: startTime
+          in: query
+          required: true
+          description: Start time to retrieve video clips
+          schema:
+            type: string
+            x-apidoc-original-type: DateTime
+        - name: endTime
+          in: query
+          required: true
+          description: End time to retrieve video clips
+          schema:
+            type: string
+            x-apidoc-original-type: DateTime
+        - name: cameraId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    startTime: '2016-04-04T09:51:52Z'
+                    endTime: '2016-04-04T09:55:52Z'
+                    camera:
+                      id: 222222
+                      name: Back Door Camera
+                      videoProvider:
+                        type: EAGLE_EYE
+                      site:
+                        id: 11111
+                        siteName: Acme Systems
+                    videoClips:
+                      - format: mp4
+                        startTime: '2016-04-04T09:52:00.527Z'
+                        endTime: '2016-04-04T09:52:28.512Z'
+                        url: https://brivo-videocache.s3.us-east-1.amazonaws.com/.....
+                      - format: mp4
+                        startTime: '2016-04-04T09:52:28.512Z'
+                        endTime: '2016-04-04T09:52:32.514Z'
+                        url: https://brivo-videocache.s3.us-east-1.amazonaws.com/.....
+        '400':
+          description: Bad Request, Invalid listing criteria specified
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified camera was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Camera not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

@@ -1,0 +1,300 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Event_Subscription endpoints. See api-overview.md for base URLs, authentication, schema conventions,
+    paging, and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Event_Subscription
+paths:
+  /event-subscriptions:
+    get:
+      operationId: EventSubscriptionsList
+      summary: Event Subscription Listing
+      description: Retrieve a listing of event subscriptions (webhook types).
+      tags:
+        - Event_Subscription
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            The filter parameter for passing in optional filter criteria. Filters follow the common filter format for
+            the api. Available filter criteria are  name  Filters based on the event subscription name Allowed
+            operators  eq: includes any event subscription with the name provided
+          schema:
+            type: string
+            x-apidoc-original-type: Text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+                    data:
+                      - id: 227
+                        name: John's Desk - Primary Door
+                        url: http://johndoe/event/site/door
+                        errorEmail: john.doe@brivo.com
+                        criteria:
+                          - id: 349
+                            criteriaType: USER
+                            criteriaOperationType: NE
+                            criteriaValue: 23361
+                        encryptedSecretWord: rL6NGWa1TkxGsyl3M3Fp9w==
+        '400':
+          description: Bad Request, Invalid listing criteria specified
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+    post:
+      operationId: EventSubscription
+      summary: Create New Event Subscription
+      description: >-
+        Create a new event subscription.
+
+
+        The event subscription defines a set of criteria for you to register a url to POST event data to. When the
+        criteria defined for a subscription are met, a notification is sent to the url provided.
+
+
+        Supported Criteria Types | Description |
+
+        SITE | Filters on site id |
+
+        USER | Filters on user id |
+
+        ACCESS-POINT | Filters on device id |
+
+        AUDIT | Filters to audit events (1) or access events (0, default) |
+
+
+
+        Audit events (or Journal events) are those listed in the audit events endpoint (#api-Events-ListAuditEvent) and
+        the Access Journal page. Access events are those listed in the access events endpoint
+        (#api-Events-ListAccessEvent) and displayed in the Access Event Tracker page.
+
+
+        Supported Criteria Operation Types | Description |
+
+        EQ | Equal |
+
+        NE | Not Equal |
+      tags:
+        - Event_Subscription
+      responses:
+        '200':
+          description: 'Webhook Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Webhook Success-Response:':
+                  value:
+                    id: 2452345
+                    name: Site 1
+                    url: http://requestb.in/13755vw1
+                    errorEmail: john.doe@acme.com
+                    criteria:
+                      - id: 349
+                        criteriaType: SITE
+                        criteriaOperationType: EQ
+                        criteriaValue: 12345
+                    encryptedSecretWord: rL6NGWa1TkxGsyl3M3Fp9w==
+        '400':
+          description: Bad Request, Invalid Site criteria
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /event-subscriptions/{eventSubscriptionId}:
+    get:
+      operationId: EventSubscriptionGet
+      summary: Get Event Subscription
+      description: Retrieves an Event Subscription by the provided id value
+      tags:
+        - Event_Subscription
+      parameters:
+        - name: eventSubscriptionId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Webhook Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Webhook Success-Response:':
+                  value:
+                    id: 2452345
+                    name: Site 1
+                    url: http://requestb.in/13755vw1
+                    errorEmail: john.doe@acme.com
+                    criteria:
+                      - id: 349
+                        criteriaType: SITE
+                        criteriaOperationType: EQ
+                        criteriaValue: 12345
+                    encryptedSecretWord: rL6NGWa1TkxGsyl3M3Fp9w==
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified event subscription was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Event subscription not found
+    put:
+      operationId: UpdateEventSubscription
+      summary: Update Event Subscription
+      description: Update event subscription.
+      tags:
+        - Event_Subscription
+      parameters:
+        - name: eventSubscriptionId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Webhook Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Webhook Success-Response:':
+                  value:
+                    id: 2452345
+                    name: Site 1
+                    url: http://requestb.in/13755vw1
+                    errorEmail: john.doe@acme.com
+                    criteria:
+                      - id: 349
+                        criteriaType: SITE
+                        criteriaOperationType: EQ
+                        criteriaValue: 12345
+                    encryptedSecretWord: rL6NGWa1TkxGsyl3M3Fp9w==
+        '400':
+          description: Bad Request, Invalid Site criteria
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+    delete:
+      operationId: DeleteEventSubscription
+      summary: Delete Event Subscription
+      description: Delete an Event Subscription
+      tags:
+        - Event_Subscription
+      parameters:
+        - name: eventSubscriptionId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified event subscription was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Event subscription not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

@@ -1,0 +1,512 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Account endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Account
+paths:
+  /accounts:
+    get:
+      operationId: AccountsList
+      summary: Account Listing
+      description: Retrieve a listing of accounts.
+      tags:
+        - Account
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are  name  Filters based on
+            an account's name Allowed operators  eq: includes any account with a name that contains the provided name
+            value
+          schema:
+            type: string
+            x-apidoc-original-type: text
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 304608
+                        name: Dealer7
+                        accountNumber: '6789692640'
+                        accountType: ONAIR
+                        masterAdmin:
+                          username: testing01
+                          firstName: Road
+                          lastName: Runner
+                      - id: 304796
+                        name: AB
+                        accountNumber: '9365091703'
+                        accountType: ONAIR
+                        masterAdmin:
+                          username: ABirds32
+                          firstName: River
+                          lastName: Swimmer
+                    offset: 1
+                    pageSize: 2
+                    count: 33
+  /accounts/summary:
+    get:
+      operationId: AccountSummary
+      summary: Retrieve Account Summary
+      description: |-
+        Retrieve account summary
+        This endpoint is available `ONLY` to administrators of type `SENIOR and MASTER`.
+      tags:
+        - Account
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    doorCount: 36
+                    activeUserCount: 58
+                    panelCount: 23
+                    cameraCount: 3
+                    panelsOffline: 21
+                    siteCount: 51
+                    administratorCount: 16
+                    credentialCount: 772
+        '403':
+          description: '403 Error-Response:'
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Access to the requested resource was denied
+  /accounts/{accountId}:
+    get:
+      operationId: RetrieveAccount
+      summary: Account Retrieval
+      description: Retrieve an account based on its id
+      tags:
+        - Account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: (Required) id associated with the account
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 304608
+                        name: Dealer7
+                        accountNumber: '6789692640'
+                        accountType: ONAIR
+                        contact:
+                          streetAddress1: 77 Wile E. Coyote Ln.
+                          streetAddress2: Suite 100
+                          city: Bethesda
+                          state: MD
+                          postalCode: '20814'
+                          country: USA
+                          telephoneNumber: 555-555-5555
+                          telephoneExtension: x77
+                          firstName: Wile
+                          lastName: Coyote
+                          email: wile.coyote@brivo.com
+                        masterAdmin:
+                          username: testing01
+                          firstName: Road
+                          lastName: Runner
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified account was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Account not found
+    put:
+      operationId: UpdateAccount
+      summary: Update Account
+      description: |-
+        Updates an existing account that is associated with the account Id given.
+
+        -
+        This action is only available to Brivo Account Config Tool Dealers who own the account and CSRs.
+
+        -
+        If the account being updated is a dealer account you need the billing and emergency contact.
+
+        - The address is not necessary for the emergency contact.
+      tags:
+        - Account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: '485386'
+                    name: Acme Corp
+                    description: Acme Operation North Division
+                    accountNumber: '2725390726'
+                    accountType: ONAIR
+                    contact:
+                      streetAddress1: 413 Cheshire Way
+                      city: ThisWay
+                      state: Underland
+                      postalCode: '21255'
+                      country: United States
+                      telephoneNumber: 222-333-1111
+                      telephoneExtension: '33'
+                      firstName: Alice
+                      lastName: Carroll
+                    masterAdmin:
+                      username: QueenOfHearts
+                      firstName: Elsie
+                      lastName: Lacie
+                      email: elacie@acme.com
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified account was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Account not found
+  /accounts/{accountId}/administrators:
+    get:
+      operationId: AccountAdminList
+      summary: Administrator Listing for an account
+      description: Retrieve a listing of administrators for a particular account.
+      tags:
+        - Account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: The Id of the account.
+          schema:
+            type: number
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 314761
+                        username: minasmythe
+                        firstName: Mina
+                        lastName: Smythe
+                        email: mina.smythet@brivo.com
+                        timezone: US/Eastern
+                        owner: false
+                      - id: 314815
+                        username: johndoe
+                        firstName: John
+                        lastName: Doe
+                        email: john.doe@brivo.com
+                        timezone: US/Central
+                        owner: true
+                    offset: 2
+                    pageSize: 20
+                    count: 32
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified account was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Account not found
+  /accounts/{accountId}/features:
+    get:
+      operationId: AccountFeaturesList
+      summary: Feature Listing for an account
+      description: Retrieve a listing of features for a particular account.
+      tags:
+        - Account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: The Id of the account.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 14
+                        name: Premise API
+                        enabled: true
+                      - id: 19
+                        name: Brivo Phone Pass
+                        enabled: true
+                      - id: 22
+                        name: Trusted Network Restrictions
+                        enabled: false
+                    count: 3
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified account was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Account not found
+  /accounts/{accountOid}/settings:
+    get:
+      operationId: AccountSettingsList
+      summary: List Account Settings
+      description: Provides a listing of the viewable settings associated with the account
+      tags:
+        - Account
+      parameters:
+        - name: accountOid
+          in: path
+          required: true
+          description: The object Id of the account.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 4312
+                        name: ACCOUNT_SETTING_OPTION
+                        value: CURRENT_VALUE
+                        defaultValue: DEFAULT_VALUE
+                      - id: 2715
+                        name: MAX_ALLOWED
+                        value: '10'
+                        defaultValue: '10'
+                    count: 2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified account was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Account not found
+  /accounts/{accountOid}/settings/{settingId}:
+    put:
+      operationId: AccountSettingsUpdate
+      summary: Update Account Setting
+      description: >-
+        Update an account setting. The following account settings cannot be updated from API and the endpoint will
+        return a 403 Forbidden error, as they can only be updated from Partner Portal:
+
+
+        - MOBILE_PASS_ALLOTMENT (settingId = 1)
+
+        - NFC_CREDENTIAL_ENABLED (settingId = 12)
+
+        - BLOCK_ONAIR (settingId = 13)
+
+        - SUPPRESS_EVENTS (settingId = 14)
+
+        - NFC_ALLOTMENT (settingId = 19)
+
+        - BRIVO_ALLEGION_MOBILE_PASS (settingId = 26)
+
+        - BRIVO_ALLEGION_MOBILE_PASS_ALLOTMENT (settingId = 27)
+      tags:
+        - Account
+      parameters:
+        - name: accountOid
+          in: path
+          required: true
+          description: The object Id of the account.
+          schema:
+            type: number
+        - name: settingId
+          in: path
+          required: true
+          description: The Id of the account setting to be updated.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 2715
+                    name: MAX_ALLOWED
+                    value: '42'
+                    defaultValue: '10'
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified account was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Account not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

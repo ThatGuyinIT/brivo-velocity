@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Features endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Features
+paths:
+  /features:
+    get:
+      operationId: GetFeatures
+      summary: Get Features
+      description: Retrieves the list of features for given user's account
+      tags:
+        - Features
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    - id: 118
+                      key: SITES
+                      displayOrder: 0
+                      applicationId: 1
+                      permissions:
+                        - id: 168
+                          key: CREATE_SITE
+                          limited: false
+                          dependencies: []
+                        - id: 169
+                          key: EDIT_SITE
+                          limited: false
+                          dependencies: []
+                        - id: 170
+                          key: DELETE_SITE
+                          limited: false
+                          dependencies: []
+                        - id: 171
+                          key: VIEW_SITE
+                          limited: true
+                          dependencies: []
+                    - id: 26
+                      key: GLOBAL_VIEW
+                      displayOrder: 2
+                      applicationId: 1
+                      permissions:
+                        - id: 30
+                          key: GLOBAL_VIEW
+                          limited: false
+                          dependencies: []
+                    - id: 28
+                      key: EVT_CLASSIFICATION
+                      displayOrder: 8
+                      applicationId: 1
+                      permissions:
+                        - id: 32
+                          key: EVT_CLASSIFICATION_VIEW
+                          limited: true
+                          dependencies: []
+                        - id: 33
+                          key: EVT_CLASSIFICATION_EDIT
+                          limited: false
+                          dependencies: []
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

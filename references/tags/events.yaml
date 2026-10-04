@@ -1,0 +1,373 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Events endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Events
+paths:
+  /events/access:
+    get:
+      operationId: ListAccessEvent
+      summary: Access Events Listing
+      description: >-
+        Retrieve a listing of Access Events. Access events include Camera, Panel, and User Events. Events are ordered
+        naturally from most recent to oldest. In order to retrieve a count for the events use the /events/counts/access
+        Call.
+      tags:
+        - Events
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: >-
+            Listed results will display beginning from the offset value. If specified the offset for event listings
+            should be the minimum occurred value of the last page read.
+          schema:
+            type: string
+            format: date-time
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. The combination of the occured and processed filters is
+            not allowed. Available filter criteria are  occurred  Filter based on the time the event occurred By default
+            occurred is limited to the current day starting at midnight UTC. An occurred range cannot be longer than a
+            24 hour period. The occurred times are truncated to the nearest hour. A smaller range can be searched by
+            specifying an offset from the end. In order to page through the events specify the offset as the last
+            occurred time of the current page. Allowed operators  gt: Searches for events after a specified date and
+            time value lt: Searches for events before a specified date and time value   Both a GT and LT filter can be
+            used by applying the separator (;) as described in the filter format   object  Any valid device,
+            access-point, camera, or control panel id. May not be combined with Site filter. Allowed operators  eq:
+            Returns events that have the provided object id value     site  Filter based on the site id value May not be
+            combined with object filter. Allowed operators  eq: Returns events that have the provided site id value    
+            event_type  Filter of event types which are desired Supports multiple comma separated values Default value
+            is all valid Event Types. Allowed operators  eq: Returns events which fall into one of the specified
+            types.   Valid Access Event Types:  non_exception exception camera     processed  Filter based on the time
+            the event was processed By default processed is limited to the current day starting at midnight UTC. A
+            processed range cannot be longer than a 24 hour period. The processed times are truncated to the nearest
+            hour. A smaller range can be searched by specifying an offset from the end. In order to page through the
+            events specify the offset as the last processed time of the current page. Allowed operators  gt: Searches
+            for events after a specified date and time value lt: Searches for events before a specified date and time
+            value   Both a GT and LT filter can be used by applying the separator (;) as described in the filter format
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    data:
+                      - uuid: 049e1ca7-592a-4249-8f8c-ebcdc8e28594
+                        securityAction:
+                          securityActionId: 5064
+                          action: Administrator Pulse Output
+                          exception: false
+                        actor:
+                          id: 912347
+                          name: QA Admin
+                        eventObject:
+                          id: 408023598
+                          name: Door 1
+                          deviceType:
+                            id: 1
+                            name: Door
+                        site:
+                          id: 7833522
+                          siteName: Home base
+                        occurred: '2024-04-17T08:52:39.724Z'
+                        processed: '2024-04-17T08:52:39.726Z'
+                        eventData:
+                          actorName: QA Admin
+                          objectName: Door 1
+                          objectGroupName: Home base
+                          actionAllowed: false
+                          objectTypeId: 2
+                          deviceTypeId: 1
+                    pageSize: 20
+        '400':
+          description: Bad Request, Invalid criteria were provided for the listing call
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: 'Invalid filters: the filter by occurred time and processed time cannot be applied at the same time'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /events/audit:
+    get:
+      operationId: ListAuditEvent
+      summary: Audit Events Listing
+      description: >-
+        Retrieve a listing of Audit Events. The Audit Event listing includes any actions that are taken by an
+        Administor. This API provides the same functionality as the Brivo Access Journal. In order to retrieve a count
+        for the events use the /events/counts/audit Call.
+      tags:
+        - Events
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: >-
+            Listed results will display beginning from the offset value. If specified the offset for event listings
+            should be the minimum occurred value of the last page read.
+          schema:
+            type: string
+            format: date-time
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. The combination of the occured and processed filters is
+            not allowed. Available filter criteria are  occurred  Filter based on the time the event occurred By default
+            occurred is limited to the current day starting at midnight UTC. An occurred range cannot be longer than a
+            24 hour period. The occurred times are truncated to the nearest hour. A smaller range can be searched by
+            specifying an offset from the end. In order to page through the events specify the offset as the last
+            occurred time of the current page. Allowed operators  gt: Searches for events after a specified date and
+            time value lt: Searches for events before a specified date and time value   Both a GT and LT filter can be
+            used by applying the separator (;) as described in the filter format   actor  Filter based on the actor id
+            value May not be combined with object criteria. Allowed operators  eq: Returns events that have the provided
+            actor id value     object  Filter based on the object id value May not be combined with actor criteria
+            Allowed operators  eq: Returns events that have the provided object id value     schedule  Filter based on
+            the schedule id value May not be combined with actor, object, or holiday criteria Allowed operators  eq:
+            Returns events that have the provided schedule id value     holiday  Filter based on the holiday id value
+            May not be combined with actor, object, or schedule criteria Allowed operators  eq: Returns events that have
+            the provided holiday id value     event_type  Filter of event types which are desired Supports multiple
+            comma separated values Allowed operators  eq: Returns events which fall into one of the specified types.  
+            Valid Audit Event types are:  account administrator badge control_panel credential custom_field device group
+            holiday ipac notification permission_template report schedule site user video     processed  Filter based on
+            the time the event was processed By default processed is limited to the current day starting at midnight
+            UTC. A processed range cannot be longer than a 24 hour period. The processed times are truncated to the
+            nearest hour. A smaller range can be searched by specifying an offset from the end. In order to page through
+            the events specify the offset as the last processed time of the current page. Allowed operators  gt:
+            Searches for events after a specified date and time value lt: Searches for events before a specified date
+            and time value   Both a GT and LT filter can be used by applying the separator (;) as described in the
+            filter format
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    data:
+                      - uuid: 049e1ca7-592a-4249-8f8c-ebcdc8e28594
+                        securityAction:
+                          securityActionId: 3005
+                          action: User Login
+                          exception: false
+                        actor:
+                          id: 912347
+                          name: QA Admin
+                        occurred: '2024-04-17T08:52:39.724Z'
+                        processed: '2024-04-17T08:52:39.726Z'
+                        eventData:
+                          actorName: QA Admin
+                          objectTypeId: 0
+                    pageSize: 20
+        '400':
+          description: Bad Request, Invalid criteria were provided for the listing call
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: 'Invalid filters: the filter by occurred time and processed time cannot be applied at the same time'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /events/counts/access:
+    get:
+      operationId: AccessEventCount
+      summary: Access Events Count
+      description: Retrieve a Count of Access Events. Access events include Camera, Panel, and User Events.
+      tags:
+        - Events
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. The combination of the occured and processed filters is
+            not allowed. Available filter criteria are  occurred  Filter based on the time the event occurred By default
+            occurred is limited to the current day starting at midnight UTC. An occurred range cannot be longer than a
+            24 hour period. The occurred times are truncated to the nearest hour. A smaller range can be searched by
+            specifying an offset from the end. In order to page through the events specify the offset as the last
+            occurred time of the current page. Allowed operators  gt: Searches for events after a specified date and
+            time value lt: Searches for events before a specified date and time value   Both a GT and LT filter can be
+            used by applying the separator (;) as described in the filter format   object  Any valid device,
+            access-point, camera, or control panel id. May not be combined with Site filter. Allowed operators  eq:
+            Returns events that have the provided object id value     site  Filter based on the site id value May not be
+            combined with object filter. Allowed operators  eq: Returns events that have the provided site id value    
+            event_type  Filter of event types which are desired Supports multiple comma separated values Default value
+            is all valid Event Types. Allowed operators  eq: Returns events which fall into one of the specified
+            types.   Valid Access Event Types:  non_exception exception camera video_linkable     processed  Filter
+            based on the time the event was processed By default processed is limited to the current day starting at
+            midnight UTC. A processed range cannot be longer than a 24 hour period. The processed times are truncated to
+            the nearest hour. A smaller range can be searched by specifying an offset from the end. In order to page
+            through the events specify the offset as the last processed time of the current page. Allowed operators  gt:
+            Searches for events after a specified date and time value lt: Searches for events before a specified date
+            and time value   Both a GT and LT filter can be used by applying the separator (;) as described in the
+            filter format
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    count: 0
+        '400':
+          description: Bad Request, Invalid criteria were provided for the listing call
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: 'Invalid filters: the filter by occurred time and processed time cannot be applied at the same time'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /events/counts/audit:
+    get:
+      operationId: CountAuditEvent
+      summary: Audit Events Count
+      description: >-
+        Retrieve a Count of the number of audit events over a time period. This function accepts the same parameters as
+        the listing call except for offset and pageSize and will return the number of Events matching the filter
+        criteria of a Listing call.
+      tags:
+        - Events
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. The combination of the occured and processed filters is
+            not allowed. Available filter criteria are  occurred  Count based on the time the event occurred By default
+            occurred is limited to the current day starting at midnight UTC. An occurred range cannot be longer than a
+            24 hour period. The occurred times are truncated to the nearest hour. Allowed operators  eq: Searches for
+            events on the day specified, disregarding the time values gt: Searches for events after a specified date and
+            time value lt: Searches for events before a specified date and time value   Both a GT and LT filter can be
+            used by applying the separator (;) as described in the filter format   actor  Count based on the actor id
+            value May not be combined with object criteria. Allowed operators  eq: Returns events that have the provided
+            actor id value     object  Count based on the object id value May not be combined with actor criteria
+            Allowed operators  eq: Returns events that have the provided object id value     schedule  Filter based on
+            the schedule id value May not be combined with actor, object, or holiday criteria Allowed operators  eq:
+            Returns events that have the provided schedule id value     holiday  Filter based on the holiday id value
+            May not be combined with actor, object, or schedule criteria Allowed operators  eq: Returns events that have
+            the provided holiday id value     event_type  Count only event types which are specified Supports multiple
+            comma separated values Default value includes all event types. Allowed operators  eq: Returns events which
+            fall into one of the specified types.   Valid Audit Event types are:  account administrator badge
+            control_panel credential custom_field device group holiday ipac notification permission_template report
+            schedule site user video     processed  Filter based on the time the event was processed By default
+            processed is limited to the current day starting at midnight UTC. A processed range cannot be longer than a
+            24 hour period. The processed times are truncated to the nearest hour. A smaller range can be searched by
+            specifying an offset from the end. In order to page through the events specify the offset as the last
+            processed time of the current page. Allowed operators  gt: Searches for events after a specified date and
+            time value lt: Searches for events before a specified date and time value   Both a GT and LT filter can be
+            used by applying the separator (;) as described in the filter format
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    count: 0
+        '400':
+          description: Bad Request, Invalid criteria were provided for the listing call
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: 'Invalid filters: the filter by occurred time and processed time cannot be applied at the same time'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

@@ -1,0 +1,236 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Custom_Field endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging,
+    and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Custom_Field
+paths:
+  /custom-fields:
+    get:
+      operationId: ListCustomFields
+      summary: Custom Field Listing
+      description: Retrieve a listing of custom fields
+      tags:
+        - Custom_Field
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: true
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    offset: 0
+                    pageSize: 20
+                    count: 4
+                    data:
+                      - id: 2562
+                        fieldName: Department
+                        fieldType: TEXT
+                        displayOrder: '1'
+                      - id: 2763
+                        fieldName: ID
+                        fieldType: NUMBER
+                        displayOrder: '2'
+                      - id: 2347
+                        fieldName: Birth Date
+                        fieldType: DATE
+                        displayOrder: '3'
+                        pattern: yyyy-dd-MM
+                      - id: 2348
+                        fieldName: Hire Date
+                        fieldType: DATE
+                        displayOrder: '4'
+                        pattern: MM/dd/yyyy
+        '400':
+          description: Bad Request, Invalid listing criteria specified
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+    post:
+      operationId: CreateCustomField
+      summary: Create Custom Field
+      description: Creates a new custom field definition
+      tags:
+        - Custom_Field
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 2562
+                    fieldName: Hire Date
+                    fieldType: DATE
+                    displayOrder: '1'
+                    pattern: MM/dd/yyyy
+        '400':
+          description: Bad Request, missing required values
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Required request parameters for custom fields were not supplied
+        '404':
+          description: Not Found, the custom field was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Unknown custom field requested for update
+  /custom-fields/{customFieldId}:
+    get:
+      operationId: RetrieveCustomField
+      summary: Retrieve Custom Field by id
+      description: Retrieves a custom field by provided id value
+      tags:
+        - Custom_Field
+      parameters:
+        - name: customFieldId
+          in: path
+          required: true
+          description: The id associated with the custom field
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 2562
+                    fieldName: Hire Date
+                    fieldType: DATE
+                    displayOrder: '1'
+                    pattern: MM/dd/yyyy
+        '404':
+          description: Not Found, the custom field was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Unknown custom field requested for update
+    put:
+      operationId: Custom_Field_UpdateCustomField
+      summary: Update Custom Field
+      description: Updates an existing custom field definition
+      tags:
+        - Custom_Field
+      parameters:
+        - name: customFieldId
+          in: path
+          required: true
+          description: The id associated with the custom field
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 2562
+                    fieldName: Hire Date
+                    fieldType: DATE
+                    displayOrder: '1'
+                    pattern: MM/dd/yyyy
+        '400':
+          description: Bad Request, missing required values
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Required request parameters for custom fields were not supplied
+        '404':
+          description: Not Found, the custom field was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Unknown custom field requested for update
+    delete:
+      operationId: Custom_Field_DeleteCustomField
+      summary: Delete Custom Field
+      description: Deletes a custom field specified by the provided customFieldId
+      tags:
+        - Custom_Field
+      parameters:
+        - name: customFieldId
+          in: path
+          required: true
+          description: The id associated with the custom field
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '404':
+          description: Not Found, the custom field was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Unknown custom field requested for update
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

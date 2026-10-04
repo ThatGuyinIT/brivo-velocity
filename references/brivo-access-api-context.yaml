@@ -1,0 +1,746 @@
+api:
+  name: Brivo API
+  title: Brivo API
+  baseUrl: https://api.brivo.com/v1/api
+  version: 1.0.0
+overview: See api-overview.md for API conventions (base URLs, authentication, schema, paging, error codes).
+endpointCount: 153
+sourceFiles:
+  - references/access_point.yaml
+  - references/account.yaml
+  - references/activity.yaml
+  - references/administrator.yaml
+  - references/application.yaml
+  - references/assignments.yaml
+  - references/camera.yaml
+  - references/control_panel.yaml
+  - references/credential.yaml
+  - references/current_date_time.yaml
+  - references/custom_field.yaml
+  - references/digital_credentials.yaml
+  - references/digital_invitations.yaml
+  - references/emergency_scenario.yaml
+  - references/event_subscription.yaml
+  - references/events.yaml
+  - references/features.yaml
+  - references/group.yaml
+  - references/guest.yaml
+  - references/holidays.yaml
+  - references/pass.yaml
+  - references/role.yaml
+  - references/schedule.yaml
+  - references/site.yaml
+  - references/user.yaml
+tags:
+  - name: Access_Point
+    file: references/access_point.yaml
+    endpointCount: 10
+    endpoints:
+      - method: GET
+        path: /access-points
+        operationId: ListAccessPoints
+        summary: Access Point Listing
+      - method: GET
+        path: /access-points/{accessPointId}
+        operationId: GetAccessPoint
+        summary: Access Point Retrieval
+      - method: POST
+        path: /access-points/{accessPointId}/activate
+        operationId: ActivateAccessPoint
+        summary: Access Point Activation
+      - method: POST
+        path: /access-points/{accessPointId}/activateElevator
+        operationId: ActivateElevator
+        summary: Elevator Activation
+      - method: GET
+        path: /access-points/{accessPointId}/cameras
+        operationId: ListCamerasAccessPoint
+        summary: List Cameras for Access Point
+      - method: GET
+        path: /access-points/{accessPointId}/groups
+        operationId: ListGroupsAccessPoint
+        summary: List Groups for Access Point
+      - method: POST
+        path: /access-points/{accessPointId}/unlock
+        operationId: RequestUnlockAccessPoint
+        summary: Unlock Access Point
+      - method: GET
+        path: /device-status/{accessPointId}
+        operationId: Live_Status
+        summary: Live Status
+      - method: POST
+        path: /schedules/change-state/{accessPointId}
+        operationId: Door_Override
+        summary: Door Override
+      - method: DELETE
+        path: /schedules/change-state/{accessPointId}
+        operationId: Door_Override_Cancel
+        summary: Door Override Cancel
+  - name: Account
+    file: references/account.yaml
+    endpointCount: 8
+    endpoints:
+      - method: GET
+        path: /accounts
+        operationId: AccountsList
+        summary: Account Listing
+      - method: GET
+        path: /accounts/summary
+        operationId: AccountSummary
+        summary: Retrieve Account Summary
+      - method: GET
+        path: /accounts/{accountId}
+        operationId: RetrieveAccount
+        summary: Account Retrieval
+      - method: PUT
+        path: /accounts/{accountId}
+        operationId: UpdateAccount
+        summary: Update Account
+      - method: GET
+        path: /accounts/{accountId}/administrators
+        operationId: AccountAdminList
+        summary: Administrator Listing for an account
+      - method: GET
+        path: /accounts/{accountId}/features
+        operationId: AccountFeaturesList
+        summary: Feature Listing for an account
+      - method: GET
+        path: /accounts/{accountOid}/settings
+        operationId: AccountSettingsList
+        summary: List Account Settings
+      - method: PUT
+        path: /accounts/{accountOid}/settings/{settingId}
+        operationId: AccountSettingsUpdate
+        summary: Update Account Setting
+  - name: Activity
+    file: references/activity.yaml
+    endpointCount: 1
+    endpoints:
+      - method: GET
+        path: /activities
+        operationId: ListActivity
+        summary: Activity Listing
+  - name: Administrator
+    file: references/administrator.yaml
+    endpointCount: 13
+    endpoints:
+      - method: GET
+        path: /administrators
+        operationId: AdminList
+        summary: Administrator Listing
+      - method: POST
+        path: /administrators
+        operationId: AdminCreate
+        summary: Create Administrator
+      - method: POST
+        path: /administrators/migrate/{administratorId}
+        operationId: MigrateAdmin
+        summary: Migrate Administrator to new permission model
+      - method: POST
+        path: /administrators/username/check
+        operationId: CheckUsername
+        summary: Check Username
+      - method: GET
+        path: /administrators/whoami
+        operationId: AdminWhoAmI
+        summary: Get Current Administrator
+      - method: GET
+        path: /administrators/{administratorId}
+        operationId: RetrieveAdmin
+        summary: Administrator Retrieval
+      - method: PUT
+        path: /administrators/{administratorId}
+        operationId: AdminUpdate
+        summary: Update Administrator
+      - method: DELETE
+        path: /administrators/{administratorId}
+        operationId: AdminDelete
+        summary: Delete Administrator
+      - method: GET
+        path: /administrators/{administratorId}/login
+        operationId: RetrieveLogin
+        summary: Retrieve Login
+      - method: POST
+        path: /administrators/{administratorId}/login
+        operationId: UpdateLogin
+        summary: Update Login
+      - method: POST
+        path: /administrators/{administratorId}/role/{roleId}
+        operationId: AddRole
+        summary: Add Role
+      - method: DELETE
+        path: /administrators/{administratorId}/role/{roleId}
+        operationId: Administrator_DeleteRole
+        summary: Remove Role
+      - method: GET
+        path: /administrators/{administratorId}/roles
+        operationId: GetAdminRoles
+        summary: Roles Listing for an Administrator
+  - name: Application
+    file: references/application.yaml
+    endpointCount: 5
+    endpoints:
+      - method: GET
+        path: /applications
+        operationId: ApplicationList
+        summary: Application Listing
+      - method: POST
+        path: /applications
+        operationId: ApplicationCreate
+        summary: Create New Application
+      - method: GET
+        path: /applications/authorized
+        operationId: AuthorizedApplicationList
+        summary: Authorized Application Listing
+      - method: GET
+        path: /applications/{applicationId}
+        operationId: ApplicationGet
+        summary: Application Retrieval
+      - method: DELETE
+        path: /applications/{applicationId}
+        operationId: DeleteApplication
+        summary: Delete Application
+  - name: Assignments
+    file: references/assignments.yaml
+    endpointCount: 2
+    endpoints:
+      - method: GET
+        path: /assignments/{administratorId}
+        operationId: getAdminAssignments
+        summary: Retrieve admin assignments
+      - method: POST
+        path: /assignments/{administratorId}
+        operationId: replaceAdminAssignments
+        summary: Configure admin assignments
+  - name: Camera
+    file: references/camera.yaml
+    endpointCount: 4
+    endpoints:
+      - method: GET
+        path: /cameras
+        operationId: CamerasList
+        summary: Camera Listing
+      - method: GET
+        path: /cameras/{cameraId}
+        operationId: RetrieveCamera
+        summary: Camera Retrieval
+      - method: GET
+        path: /cameras/{cameraId}/access-points
+        operationId: ListCameraAccessPoints
+        summary: Camera Access Point Listing
+      - method: GET
+        path: /cameras/{cameraId}/video
+        operationId: CameraVideoClipList
+        summary: Camera Video Clip Listing
+  - name: Control_Panel
+    file: references/control_panel.yaml
+    endpointCount: 4
+    endpoints:
+      - method: GET
+        path: /control-panels
+        operationId: ListControlPanels
+        summary: Get Control Panel Listing
+      - method: GET
+        path: /control-panels/{controlPanelId}
+        operationId: RetrieveControlPanel
+        summary: Get Control Panel by id
+      - method: GET
+        path: /control-panels/{controlPanelId}/firmware
+        operationId: ControlPanelFirmwareGet
+        summary: Get Control Panel firmware
+      - method: POST
+        path: /control-panels/{controlPanelId}/firmware
+        operationId: ControlPanelFirmwareUpdate
+        summary: Update Control Panel firmware
+  - name: Credential
+    file: references/credential.yaml
+    endpointCount: 11
+    endpoints:
+      - method: GET
+        path: /credentials
+        operationId: ListCredentials
+        summary: Credential Listing
+      - method: POST
+        path: /credentials
+        operationId: CreateCredential
+        summary: Create New Credential
+      - method: POST
+        path: /credentials/createAndAssignEELPRCredential/{userId}
+        operationId: createAndAssignEELPRLicensePlate
+        summary: Create New EEN License Plate Credential
+      - method: POST
+        path: /credentials/createAndAssignFaceprintCredential/{userId}
+        operationId: faceprintCredential
+        summary: Create and Assign Faceprint Credential
+      - method: DELETE
+        path: /credentials/deleteFaceprintCredential/{userId}
+        operationId: DeleteCredentialsDeletefaceprintcredentialUserid
+        summary: Delete Faceprint Credential
+      - method: GET
+        path: /credentials/formats
+        operationId: ListCredentialFormats
+        summary: List credential formats
+      - method: PUT
+        path: /credentials/updateFaceprintCredentialDates/{userId}
+        operationId: PutCredentialsUpdatefaceprintcredentialdatesUserid
+        summary: Edit Dates for Faceprint Credential
+      - method: GET
+        path: /credentials/{credentialId}
+        operationId: GetCredential
+        summary: Credential Retrieval
+      - method: DELETE
+        path: /credentials/{credentialId}
+        operationId: DeleteCredential
+        summary: Delete Credential
+      - method: GET
+        path: /credentials/{credentialId}/user
+        operationId: RetrieveUserByCredential
+        summary: Retrieve user by credential id
+      - method: DELETE
+        path: /credentials/{userId}/unassignAndDeleteEELPRCredential/{credentialId}
+        operationId: UnassignAndDeleteEELPRLicensePlate
+        summary: Revoke and Delete an EEN License Plate Credential
+  - name: Current_Date_Time
+    file: references/current_date_time.yaml
+    endpointCount: 1
+    endpoints:
+      - method: GET
+        path: /time
+        operationId: GetCurrentTime
+        summary: Get server date and time
+  - name: Custom_Field
+    file: references/custom_field.yaml
+    endpointCount: 5
+    endpoints:
+      - method: GET
+        path: /custom-fields
+        operationId: ListCustomFields
+        summary: Custom Field Listing
+      - method: POST
+        path: /custom-fields
+        operationId: CreateCustomField
+        summary: Create Custom Field
+      - method: GET
+        path: /custom-fields/{customFieldId}
+        operationId: RetrieveCustomField
+        summary: Retrieve Custom Field by id
+      - method: PUT
+        path: /custom-fields/{customFieldId}
+        operationId: Custom_Field_UpdateCustomField
+        summary: Update Custom Field
+      - method: DELETE
+        path: /custom-fields/{customFieldId}
+        operationId: Custom_Field_DeleteCustomField
+        summary: Delete Custom Field
+  - name: Digital_Credentials
+    file: references/digital_credentials.yaml
+    endpointCount: 3
+    endpoints:
+      - method: GET
+        path: /credentials/digital/allegion-allotment
+        operationId: ReturnDigitalCredAllotmentForAllegion
+        summary: Digital Credential Allotment for Allegion
+      - method: GET
+        path: /credentials/digital/allotment
+        operationId: ReturnDigitalCredAllotment
+        summary: Digital Credential Allotment
+      - method: GET
+        path: /users/credentials/digital
+        operationId: GetUserDigitalCredential
+        summary: Digital Credential Retrieval
+  - name: Digital_Invitations
+    file: references/digital_invitations.yaml
+    endpointCount: 4
+    endpoints:
+      - method: POST
+        path: /users/credentials/brivo-wallet-pass
+        operationId: UpdateBrivoWalletPass
+        summary: Assign/revoke brivo wallet passes
+      - method: GET
+        path: /users/{userId}/credentials/digital-invitations
+        operationId: ListUserDigitalInvitations
+        summary: List User Digital Invitations
+      - method: POST
+        path: /users/{userId}/credentials/digital-invitations
+        operationId: CreateUserDigitalInvitation
+        summary: Create User Digital Invitation
+      - method: DELETE
+        path: /users/{userId}/credentials/digital-invitations
+        operationId: Cancel_user_digital_invitation
+        summary: Cancel User Digital Invitation
+  - name: Emergency_Scenario
+    file: references/emergency_scenario.yaml
+    endpointCount: 11
+    endpoints:
+      - method: GET
+        path: /emergency-scenarios
+        operationId: getEmergencyScenariosList
+        summary: List emergency scenarios
+      - method: GET
+        path: /emergency-scenarios/active-scenarios
+        operationId: getActiveEmergencyScenariosList
+        summary: List active emergency scenarios
+      - method: POST
+        path: /emergency-scenarios/clear-all
+        operationId: clearAllScenarios
+        summary: Clear All Emergency scenarios
+      - method: POST
+        path: /emergency-scenarios/default-egress/clear
+        operationId: clearDefaultEgressScenario
+        summary: Clear Default Emergency Egress scenario
+      - method: POST
+        path: /emergency-scenarios/default-egress/initiate
+        operationId: initiateDefaultEgressScenario
+        summary: Initiate Default Emergency Egress scenario
+      - method: POST
+        path: /emergency-scenarios/default-lockdown/clear
+        operationId: clearDefaultLockdownScenario
+        summary: Clear Default Emergency Lockdown scenario
+      - method: POST
+        path: /emergency-scenarios/default-lockdown/initiate
+        operationId: initiateDefaultLockdownScenario
+        summary: Initiate Default Emergency Lockdown scenario
+      - method: POST
+        path: /emergency-scenarios/egress/{scenarioId}/clear
+        operationId: clearEmergencyEgressScenario
+        summary: Clear Emergency Egress scenario
+      - method: POST
+        path: /emergency-scenarios/egress/{scenarioId}/initiate
+        operationId: initiateEmergencyEgressScenario
+        summary: Initiate Emergency Egress scenario
+      - method: POST
+        path: /emergency-scenarios/lockdown/{scenarioId}/clear
+        operationId: clearEmergencyLockdownScenario
+        summary: Clear Emergency Lockdown scenario
+      - method: POST
+        path: /emergency-scenarios/lockdown/{scenarioId}/initiate
+        operationId: initiateEmergencyLockdownScenario
+        summary: Initiate Emergency Lockdown scenario
+  - name: Event_Subscription
+    file: references/event_subscription.yaml
+    endpointCount: 5
+    endpoints:
+      - method: GET
+        path: /event-subscriptions
+        operationId: EventSubscriptionsList
+        summary: Event Subscription Listing
+      - method: POST
+        path: /event-subscriptions
+        operationId: EventSubscription
+        summary: Create New Event Subscription
+      - method: GET
+        path: /event-subscriptions/{eventSubscriptionId}
+        operationId: EventSubscriptionGet
+        summary: Get Event Subscription
+      - method: PUT
+        path: /event-subscriptions/{eventSubscriptionId}
+        operationId: UpdateEventSubscription
+        summary: Update Event Subscription
+      - method: DELETE
+        path: /event-subscriptions/{eventSubscriptionId}
+        operationId: DeleteEventSubscription
+        summary: Delete Event Subscription
+  - name: Events
+    file: references/events.yaml
+    endpointCount: 4
+    endpoints:
+      - method: GET
+        path: /events/access
+        operationId: ListAccessEvent
+        summary: Access Events Listing
+      - method: GET
+        path: /events/audit
+        operationId: ListAuditEvent
+        summary: Audit Events Listing
+      - method: GET
+        path: /events/counts/access
+        operationId: AccessEventCount
+        summary: Access Events Count
+      - method: GET
+        path: /events/counts/audit
+        operationId: CountAuditEvent
+        summary: Audit Events Count
+  - name: Features
+    file: references/features.yaml
+    endpointCount: 1
+    endpoints:
+      - method: GET
+        path: /features
+        operationId: GetFeatures
+        summary: Get Features
+  - name: Group
+    file: references/group.yaml
+    endpointCount: 11
+    endpoints:
+      - method: GET
+        path: /groups
+        operationId: ListGroups
+        summary: Group Listing
+      - method: POST
+        path: /groups
+        operationId: CreateGroup
+        summary: Create Group
+      - method: GET
+        path: /groups/{groupId}
+        operationId: RetrieveGroup
+        summary: Group Retrieval
+      - method: PUT
+        path: /groups/{groupId}
+        operationId: UpdateGroup
+        summary: Update Group
+      - method: DELETE
+        path: /groups/{groupId}
+        operationId: DeleteGroup
+        summary: Delete Group
+      - method: GET
+        path: /groups/{groupId}/access/access-points
+        operationId: GetGroupsGroupidAccessAccessPoints
+        summary: List Group Permission
+      - method: PUT
+        path: /groups/{groupId}/access/access-points/{accessPointId}
+        operationId: assignPermissionToGroup
+        summary: Assign Permission to Group
+      - method: DELETE
+        path: /groups/{groupId}/access/access-points/{accessPointId}
+        operationId: DeleteGroupsGroupidAccessAccessPointsAccesspointid
+        summary: Delete Group Permission
+      - method: GET
+        path: /groups/{groupId}/users
+        operationId: ListUsersInGroup
+        summary: List Users within Group
+      - method: PUT
+        path: /groups/{groupId}/users/{userId}
+        operationId: AddUserToGroup
+        summary: Assign User to Group
+      - method: DELETE
+        path: /groups/{groupId}/users/{userId}
+        operationId: RemoveUserFromGroup
+        summary: Remove User from Group
+  - name: Guest
+    file: references/guest.yaml
+    endpointCount: 3
+    endpoints:
+      - method: POST
+        path: /brivo-visitor/create-and-assign-visitor-user
+        operationId: CreateAndAssignGuestUser
+        summary: Create new Guest by Admin host
+      - method: DELETE
+        path: /brivo-visitor/{visitorUserId}
+        operationId: deleteGuestUser
+        summary: Delete Guest by associated user id called by an Admin User
+      - method: POST
+        path: /brivo-visitor/{visitorUserId}/credentials/digital-invitation
+        operationId: regenerateDigitalInvitationToVisitorUser
+        summary: Regenerate the Digital Invitation for the Guest
+  - name: Holidays
+    file: references/holidays.yaml
+    endpointCount: 4
+    endpoints:
+      - method: GET
+        path: /holidays
+        operationId: ListHolidays
+        summary: Holiday Listing
+      - method: GET
+        path: /holidays/{id}
+        operationId: GetHoliday
+        summary: Get Holiday
+      - method: PUT
+        path: /holidays/{id}
+        operationId: UpdateHoliday
+        summary: Update Holiday
+      - method: DELETE
+        path: /holidays/{id}
+        operationId: DeleteHoliday
+        summary: Delete Holiday
+  - name: Pass
+    file: references/pass.yaml
+    endpointCount: 1
+    endpoints:
+      - method: GET
+        path: /pass
+        operationId: GetPass
+        summary: Get Mobile Pass
+  - name: Role
+    file: references/role.yaml
+    endpointCount: 4
+    endpoints:
+      - method: GET
+        path: /roles
+        operationId: getRoles
+        summary: Roles Listing
+      - method: POST
+        path: /roles
+        operationId: CreateRole
+        summary: Create Role
+      - method: PUT
+        path: /roles/{roleId}
+        operationId: UpdateRole
+        summary: Update Role
+      - method: DELETE
+        path: /roles/{roleId}
+        operationId: Role_DeleteRole
+        summary: Delete Role
+  - name: Schedule
+    file: references/schedule.yaml
+    endpointCount: 5
+    endpoints:
+      - method: GET
+        path: /schedules
+        operationId: List_Schedules
+        summary: Schedule Listing
+      - method: POST
+        path: /schedules/
+        operationId: Create_Schedule
+        summary: Create Schedule
+      - method: GET
+        path: /schedules/{scheduleId}
+        operationId: Schedule_Retrieval
+        summary: Schedule Retrieval
+      - method: PUT
+        path: /schedules/{scheduleId}
+        operationId: Update_Schedule
+        summary: Update Schedule
+      - method: DELETE
+        path: /schedules/{scheduleId}
+        operationId: Delete_Schedule
+        summary: Delete Schedule
+  - name: Site
+    file: references/site.yaml
+    endpointCount: 10
+    endpoints:
+      - method: GET
+        path: /sites
+        operationId: ListSites
+        summary: Site Listing
+      - method: GET
+        path: /sites/proximity
+        operationId: ListProximityOnSites
+        summary: List Proximity Information Within Sites
+      - method: PUT
+        path: /sites/proximity/wifi
+        operationId: RegisterProximityWiFiForSites
+        summary: Register Proximity Wifi for Sites
+      - method: GET
+        path: /sites/root
+        operationId: ListRootSites
+        summary: Root Site Listing
+      - method: GET
+        path: /sites/{siteId}
+        operationId: RetrieveSite
+        summary: Site Retrieval
+      - method: GET
+        path: /sites/{siteId}/access-points
+        operationId: RetrieveAccessPoints
+        summary: List Access Points for Site
+      - method: GET
+        path: /sites/{siteId}/cameras
+        operationId: RetrieveCameras
+        summary: Site Camera Listing
+      - method: GET
+        path: /sites/{siteId}/groups
+        operationId: RetrieveGroups
+        summary: Site Group Listing
+      - method: GET
+        path: /sites/{siteId}/proximity
+        operationId: RetrieveProximityBySite
+        summary: Gets proximity information for a Site
+      - method: PUT
+        path: /sites/{siteId}/proximity/wifi
+        operationId: RegisterProximityWiFi
+        summary: Register Proximity Wifi
+  - name: User
+    file: references/user.yaml
+    endpointCount: 23
+    endpoints:
+      - method: GET
+        path: /batch/{jobId}
+        operationId: GetBatchJobStatus
+        summary: Get Batch Job Status
+      - method: GET
+        path: /users
+        operationId: ListUsers
+        summary: List Users
+      - method: POST
+        path: /users
+        operationId: CreateUser
+        summary: Create new user
+      - method: POST
+        path: /users/batch
+        operationId: BatchAssignUsersToGroup
+        summary: Batch Assign Users to Group
+      - method: GET
+        path: /users/{externalId}/external
+        operationId: RetrieveUserByExternal
+        summary: Retrieve by external id
+      - method: GET
+        path: /users/{id}/custom-fields
+        operationId: ListUsersCustomFields
+        summary: List user's custom fields
+      - method: POST
+        path: /users/{id}/groups
+        operationId: UpdateUsersGroups
+        summary: Update user's group memberships
+      - method: GET
+        path: /users/{userId}
+        operationId: RetrieveUser
+        summary: Retrieve by id
+      - method: PUT
+        path: /users/{userId}
+        operationId: UpdateUser
+        summary: Update user
+      - method: DELETE
+        path: /users/{userId}
+        operationId: Delete_User
+        summary: Delete User
+      - method: PATCH
+        path: /users/{userId}
+        operationId: PatchUser
+        summary: Patch user
+      - method: GET
+        path: /users/{userId}/credentials
+        operationId: GetCredentialsForUser
+        summary: Retrieve Assigned Credentials
+      - method: PUT
+        path: /users/{userId}/credentials/{credentialId}
+        operationId: UserAssignCredential
+        summary: Assign Credential and Dates
+      - method: DELETE
+        path: /users/{userId}/credentials/{credentialId}
+        operationId: RemoveCredentialFromUser
+        summary: Remove Credential from User
+      - method: PUT
+        path: /users/{userId}/custom-fields/{customFieldId}
+        operationId: User_UpdateCustomField
+        summary: Update Custom Field Value
+      - method: DELETE
+        path: /users/{userId}/custom-fields/{customFieldId}
+        operationId: User_DeleteCustomField
+        summary: Delete Custom Field Value
+      - method: GET
+        path: /users/{userId}/groups
+        operationId: ListUsersGroups
+        summary: List user's groups
+      - method: GET
+        path: /users/{userId}/photo
+        operationId: GetUserPhoto
+        summary: Get user photo
+      - method: POST
+        path: /users/{userId}/photo
+        operationId: UploadUserPhoto
+        summary: Upload user photo
+      - method: DELETE
+        path: /users/{userId}/photo
+        operationId: Delete_user_photo
+        summary: Delete user photo
+      - method: POST
+        path: /users/{userId}/revoke-credentials
+        operationId: RevokeUserCredentials
+        summary: Revoke User Credentials
+      - method: GET
+        path: /users/{userId}/suspended
+        operationId: QuerySuspendedStatus
+        summary: Query suspended status
+      - method: PUT
+        path: /users/{userId}/suspended
+        operationId: ToggleSuspendedStatus
+        summary: Toggle suspended status

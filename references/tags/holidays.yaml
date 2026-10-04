@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Holidays endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Holidays
+paths:
+  /holidays:
+    get:
+      operationId: ListHolidays
+      summary: Holiday Listing
+      description: |-
+        Retrieve a listing of Holidays.
+
+        - This action is only available to Brivo Account Config Tool Administrators
+        - Administrator must have access to a Site to retrieve holidays outside the Universal site
+      tags:
+        - Holidays
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are:  name  Filters based on
+            holiday name Allowed operators:  eq: includes any holiday with a name that contains the provided name
+            value     site  Filters based on site name. The site "universal" may be used to filter to only holidays that
+            apply to all sites. Allowed operators:  eq: includes any holiday with a site name that contains the provided
+            name value     start  Filters based on holiday start time Allowed operators:  eq: includes any holiday with
+            a start time of exactly the provided time value gt: includes any holiday with a start time after the
+            provided time value     end  Filters based on holiday end time Allowed operators:  eq: includes any holiday
+            with an end time of exactly the provided time value lt: includes any holiday with an end time before the
+            provided time value
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 12318
+                        name: New Year's Day
+                        start: '2019-01-01T00:00:00'
+                        end: '2019-01-01T23:59:00'
+                        siteName: Universal
+                    offset: 0
+                    pageSize: 50
+                    count: 1
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /holidays/{id}:
+    get:
+      operationId: GetHoliday
+      summary: Get Holiday
+      description: Retrieve a single Holiday by ID, including writeable flag and associated schedules.
+      tags:
+        - Holidays
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the holiday to retrieve
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 12318
+                    name: New Year's Day
+                    siteId: 273485
+                    siteName: Main Office
+                    start: '2026-01-01T00:00:00'
+                    end: '2026-01-01T23:59:00'
+                    writeable: true
+                    schedules:
+                      - id: 18980
+                        name: Mon-Fri 9-5
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+    put:
+      operationId: UpdateHoliday
+      summary: Update Holiday
+      description: >-
+        Update an existing Holiday. The siteId cannot be changed after creation. Requires the holiday to be writeable by
+        the current user.
+      tags:
+        - Holidays
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the holiday to update
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The holiday's name. Maximum 96 characters.
+                siteId:
+                  type: number
+                  description: The id of the site associated to the holiday. Must match existing value.
+                start:
+                  type: string
+                  format: date-time
+                  description: The date the holiday starts
+                end:
+                  type: string
+                  format: date-time
+                  description: The date the holiday ends
+                schedules:
+                  type: array
+                  items:
+                    type: number
+                  description: Full replacement of schedule associations. Send empty array to remove all.
+              required:
+                - name
+                - siteId
+                - start
+                - end
+      responses:
+        '400':
+          description: Bad Request, the holiday name is empty
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    message: Start date cannot be greater or equal than end date.
+                    code: 400
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+    delete:
+      operationId: DeleteHoliday
+      summary: Delete Holiday
+      description: >-
+        Delete an existing Holiday. Requires the holiday to be writeable by the current user. Schedule associations are
+        removed before deletion. Universal holidays can only be deleted by administrators with access to all sites.
+      tags:
+        - Holidays
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the holiday to delete
+          schema:
+            type: number
+      responses:
+        '204':
+          description: 'Success-Response:'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

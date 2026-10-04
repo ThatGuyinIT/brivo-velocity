@@ -1,0 +1,144 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Assignments endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging,
+    and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Assignments
+paths:
+  /assignments/{administratorId}:
+    get:
+      operationId: getAdminAssignments
+      summary: Retrieve admin assignments
+      description: Get admin assignments
+      tags:
+        - Assignments
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: The ID of the administrator for which the assignments are returned
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    sites:
+                      isAll: true
+                      assignments: []
+                    groups:
+                      isAll: false
+                      assignments:
+                        - name: Group 1
+                          id: 111
+                        - name: Group 2
+                          id: 222
+                    emergencyScenarios:
+                      isAll: false
+                      assignments: []
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+    post:
+      operationId: replaceAdminAssignments
+      summary: Configure admin assignments
+      description: >-
+        Configure admin assignments. Limit the administrator to manage users in the selected user groups, devices in the
+        selected sites, and emergency scenarios. You can allow or disallow all via the assignmentType parameter ("ALL"
+        or "NONE" respectively), or specify specific entries by using an assignmentType value of "SELECTED", and listing
+        the individual entries via the "selectedIds" parameter.
+      tags:
+        - Assignments
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: The ID of the administrator for which the assignments are configured
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    sites:
+                      isAll: true
+                      assignments: []
+                    groups:
+                      isAll: false
+                      assignments:
+                        - name: Group 1
+                          id: 111
+                        - name: Group 2
+                          id: 222
+                    emergencyScenarios:
+                      isAll: false
+                      assignments: []
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

@@ -1,0 +1,647 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Group endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Group
+paths:
+  /groups:
+    get:
+      operationId: ListGroups
+      summary: Group Listing
+      description: |-
+        Retrieve a listing of Groups
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api.  Available filter criteria are: - `name` - Filters
+            based on a group name - Allowed operators: - eq: includes any group with a name that contains the provided
+            name value
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 442211
+                        name: Staff
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+    post:
+      operationId: CreateGroup
+      summary: Create Group
+      description: |-
+        Create a new group
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: The name of the group
+          schema:
+            type: string
+            x-apidoc-original-type: Text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 8219006
+                    name: staff
+                    keypadUnlock: false
+                    immuneToAntipassback: false
+                    excludedFromLockdown: false
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Group creation requires a name parameter of 35 characters or less
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /groups/{groupId}:
+    get:
+      operationId: RetrieveGroup
+      summary: Group Retrieval
+      description: |-
+        Retrieves a Group by the provided id value
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 76336
+                    name: Staff
+                    antipassbackResetTime: '23:59'
+                    keypadUnlock: false
+                    immuneToAntipassback: false
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+    put:
+      operationId: UpdateGroup
+      summary: Update Group
+      description: |-
+        Update the group associated with the provided id
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 76336
+                    name: Staff
+                    antipassbackResetTime: '23:59'
+                    keypadUnlock: false
+                    immuneToAntipassback: false
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+    delete:
+      operationId: DeleteGroup
+      summary: Delete Group
+      description: |-
+        Deletes the group associated with the provided id
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Success example
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+        '412':
+          description: Precondition Failed, the group is created for a multifamily site and cannot be deleted individually
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: 'Cannot delete group: group is created for a multifamily site.'
+  /groups/{groupId}/access/access-points:
+    get:
+      operationId: GetGroupsGroupidAccessAccessPoints
+      summary: List Group Permission
+      description: |-
+        Retrieve a listing of access points and schedules that belong to the specified group.
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api.  Available filter criteria are: - `access_point_name` -
+            Filters based on a access point name - Allowed operators: - eq: includes any access point with access point
+            name that contains the provided access point name value  - `access_point_type` - Filters based on a access
+            point type - Multiple values can be comma separated - Allowed operators: - eq: includes any access point
+            with a given access point type value - ne: excludes any access point with a given access point type value -
+            Allowed access_point_type values - DOOR - WIEGAND - FLOOR - SALTO_DOOR - ALLEGION_DOOR - ASSA_ABLOY_DOOR -
+            OFFLINE_DOOR - SIMONS_VOSS_LOCK - RESIDEO_WIFI_THERMOSTAT - returns access points that match the given
+            access point type value. - `schedule_name` - Filters based on a schedule_name name - Allowed operators: -
+            eq: includes any schedule with schedule name that contains the provided name value  -
+            `privacy_mode_override` - Filters based on a privacy_mode_override - Allowed operators: - eq: includes any
+            privacy mode override with the given privacy mode override value - Allowed privacy_mode_override values -
+            TRUE, FALSE - returns access points that match the given privacy mode override value. - `Note:` privacy mode
+            is currently supported only for Salto, Allegion and ASSA Abloy access point types
+          schema:
+            type: string
+            x-apidoc-original-type: text
+        - name: groupId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - accessPoint:
+                          id: 442211
+                          name: Revolving Door
+                          type: Allegion Door
+                        schedule:
+                          id: 339955
+                          name: 24x7 - Always On
+                      - accessPoint:
+                          id: 58805
+                          name: Sample salto door
+                          type: Salto Door Lock
+                        schedule:
+                          id: 43293
+                          name: 24x7 Schedule
+                        privacyModeOverride: true
+                      - accessPoint:
+                          id: 149780
+                          name: salto_sample_door
+                          type: Salto Door Lock
+                        schedule:
+                          id: 43293
+                          name: 24x7 Schedule
+                      - accessPoint:
+                          id: 542211
+                          name: Security Door
+                          type: Door
+                        schedule:
+                          id: 439955
+                          name: 9 to 5 - Sometimes On
+                    offset: 0
+                    pageSize: 20
+                    count: 4
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+  /groups/{groupId}/access/access-points/{accessPointId}:
+    put:
+      operationId: assignPermissionToGroup
+      summary: Assign Permission to Group
+      description: |-
+        Assign a group permission to the given accessPoint
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the accesspoint
+          schema:
+            type: number
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    accessPoint:
+                      id: 442211
+                      name: Wireless Revolving Door
+                      type: Salto Door
+                    schedule:
+                      id: 439955
+                      name: 24x7 - Always On
+                    privacyModeOverride: true
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: privacy mode support for this device is not enabled
+        '403':
+          description: Forbidden, You are not allowed to perform that action
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: This functionality is unavailable for this admin
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found/ Unknown Group
+    delete:
+      operationId: DeleteGroupsGroupidAccessAccessPointsAccesspointid
+      summary: Delete Group Permission
+      description: |-
+        Revoke a group permission to the given accessPoint
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: accessPointId
+          in: path
+          required: true
+          description: The id associated with the accesspoint
+          schema:
+            type: number
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+      responses:
+        '403':
+          description: Forbidden, You are not allowed to perform that action
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: This functionality is unavailable for this admin
+        '404':
+          description: Access point not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found/ Unknown Group
+  /groups/{groupId}/users:
+    get:
+      operationId: ListUsersInGroup
+      summary: List Users within Group
+      description: |-
+        Retrieve a listing of Users that belong to the specified group.
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 442211
+                        externalId: Star Lord
+                        firstName: Peter
+                        middleName: Jason
+                        lastName: Quill
+                        suspended: false
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+  /groups/{groupId}/users/{userId}:
+    put:
+      operationId: AddUserToGroup
+      summary: Assign User to Group
+      description: |-
+        Assigns a user to a group
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Success example
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: User cannot be assigned to the group as its credentials already exist in a linked group
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+    delete:
+      operationId: RemoveUserFromGroup
+      summary: Remove User from Group
+      description: |-
+        Removes a user from the specified group
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: The id associated with the group
+          schema:
+            type: number
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Success example
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

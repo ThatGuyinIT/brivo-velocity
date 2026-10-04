@@ -1,0 +1,23 @@
+# Private working notes - never pushed
+/docs/
+/ToDo.md
+
+# Scratch/ephemeral output - never committed
+/temp/
+
+# Node
+/node_modules/
+/dist/
+npm-debug.log*
+
+# Local Claude Code settings - machine-specific, not project content
+/.claude/
+
+# Never commit secrets, even though credentials should never land in a file here anyway
+.env
+*.env.local
+brivo-velocity.env
+brivo-velocity.token.json
+
+# DEV_MODE log file - can contain an unredacted Basic auth header (see src/brivo/auth.ts)
+*.log

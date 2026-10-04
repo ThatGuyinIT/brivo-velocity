@@ -1,0 +1,544 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Site endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and error
+    codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Site
+paths:
+  /sites:
+    get:
+      operationId: ListSites
+      summary: Site Listing
+      description: |-
+        Retrieve a listing of sites that are viewable to the caller
+
+        - This action is only available to Brivo Account Config Tool and Card Holders
+      tags:
+        - Site
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are  name  Filters based on a
+            site name Allowed operators  eq: includes any sites with a name that contains the provided name value
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 111
+                        siteName: Site 1
+                      - id: 222
+                        siteName: Site 2
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '400':
+          description: Bad Request, Invalid listing criteria specified
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+  /sites/proximity:
+    get:
+      operationId: ListProximityOnSites
+      summary: List Proximity Information Within Sites
+      description: Retrieve a listing of sites with their proximity information
+      tags:
+        - Site
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    data:
+                      - id: 1234
+                        name: Acme1
+                        proximity:
+                          wifi:
+                            - ssid: AcmeCorporateNetwork
+                            - ssid: GuestWifiNetwork
+                      - id: 4321
+                        name: Acme2
+                        proximity:
+                          wifi:
+                            - ssid: AcmeCorporateNetwork
+                            - ssid: GuestWifiNetwork
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /sites/proximity/wifi:
+    put:
+      operationId: RegisterProximityWiFiForSites
+      summary: Register Proximity Wifi for Sites
+      description: Register Proximity WiFi SSID Connections for different sites
+      tags:
+        - Site
+      responses:
+        '204':
+          description: 'Success-Response:'
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+  /sites/root:
+    get:
+      operationId: ListRootSites
+      summary: Root Site Listing
+      description: >-
+        Retrieve a listing of the account's root (top-level) sites.
+
+
+        - Available to OnAir power admins, or to callers holding any of the MANAGE_ACCOUNT_SETTINGS_UPDATE,
+        MANAGE_ACCOUNT_SETTINGS_VIEW, or VIEW_SITE permissions.
+      tags:
+        - Site
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: Filters follow the common filter format for the api.
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /sites/{siteId}:
+    get:
+      operationId: RetrieveSite
+      summary: Site Retrieval
+      description: Retrieve a single site based on its id
+      tags:
+        - Site
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          description: id associated with the site
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 111
+                    siteName: Site 1
+                    timeZone: US/Eastern
+                    address:
+                      streetAddress1: Text
+                      streetAddress2: Text
+                      city: Text
+                      state: Text
+                      postalCode: Text
+                      country: Text
+                      telephoneNumber: Text
+                      telephoneExtension: Text
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+  /sites/{siteId}/access-points:
+    get:
+      operationId: RetrieveAccessPoints
+      summary: List Access Points for Site
+      description: |-
+        Retrieve the access-points that are viewable to the caller
+
+        - This action is only available to Brivo Account Config Tool and Card Holders
+      tags:
+        - Site
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          description: id associated with the site
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are  name  Filters based on
+            an access point's name Allowed operators  eq: includes any access point with a name that contains the
+            provided name value     report_live_status  Filters based on live status value Allowed operators  eq: "true"
+            includes any access point where the live status is true. "false" includes any access points where the live
+            status is null or false. NOTE: Live status is only supported for 6k and 300 panels.     serial_number 
+            Filters based on offline lock serial numbers Allowed operators:  eq: includes only access points that match
+            the provided value or comma-separated list of values     access_point_types  Filters based on access point
+            type Allowed operators:  eq: includes only access points whose type matches one of the provided
+            comma-separated type names (e.g. DOOR, SALTO_DOOR). An unknown type name returns a 400 Bad Request.  
+            Accepted values:  DOOR FLOOR SALTO_DOOR ALLEGION_DOOR ASSA_ABLOY_DOOR OFFLINE_DOOR SIMONS_VOSS_LOCK
+            YONOMI_LOCK
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 76683
+                        name: CP2Door1
+                        type: Door
+                        controlPanelId: 76719
+                        siteId: 121212
+                        siteName: Enterprise
+                        activationEnabled: true
+                    count: 1
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+  /sites/{siteId}/cameras:
+    get:
+      operationId: RetrieveCameras
+      summary: Site Camera Listing
+      description: Retrieve a listing of cameras based on site id
+      tags:
+        - Site
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          description: The id associated with the site
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 8675308
+                        name: Camera 1 West Side
+                        site:
+                          id: 8675309
+                          siteName: Acme West Site
+                      - id: 9037686
+                        name: Camera 2 West Side
+                        site:
+                          id: 8675309
+                          siteName: Acme West Site
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+  /sites/{siteId}/groups:
+    get:
+      operationId: RetrieveGroups
+      summary: Site Group Listing
+      description: Retrieve a listing of groups based on site id
+      tags:
+        - Site
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          description: The id associated with the site
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 18073
+                        name: Staff
+                      - id: 9037686
+                        name: Visitors
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+  /sites/{siteId}/proximity:
+    get:
+      operationId: RetrieveProximityBySite
+      summary: Gets proximity information for a Site
+      description: |-
+        Retrieve the Site with the proximity information attached from the given site Id
+
+        - This action is only available to Brivo Account Config Tool Administrators
+      tags:
+        - Site
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          description: id associated with the site
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 196098
+                    siteName: 1_SaltoTestSite
+                    proximity:
+                      wifi:
+                        - ssid: nonwifi
+                        - ssid: wifi1
+                        - ssid: wifi2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+  /sites/{siteId}/proximity/wifi:
+    put:
+      operationId: RegisterProximityWiFi
+      summary: Register Proximity Wifi
+      description: Register Proximity WiFi SSID Connections
+      tags:
+        - Site
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              examples:
+                Successful Response:
+                  value:
+                    id: 4321
+                    name: Acme1
+                    proximity:
+                      wifi:
+                        - ssid: AcmeCorporateNetwork
+                        - ssid: GuestWifiNetwork
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, The requested site was not found
+          content:
+            application/json:
+              examples:
+                'Error-Response:':
+                  value:
+                    code: 404
+                    message: Site not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

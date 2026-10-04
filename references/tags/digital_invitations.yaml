@@ -1,0 +1,310 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Digital_Invitations endpoints. See api-overview.md for base URLs, authentication, schema conventions,
+    paging, and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Digital_Invitations
+paths:
+  /users/credentials/brivo-wallet-pass:
+    post:
+      operationId: UpdateBrivoWalletPass
+      summary: Assign/revoke brivo wallet passes
+      description: Assign/revoke brivo wallet passes
+      tags:
+        - Digital_Invitations
+      parameters:
+        - name: nfcEnabled
+          in: query
+          required: true
+          description: Whether to enable this invitation for use with NFC. Default is false.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    bmpCredentials:
+                      - userId: 7939713
+                        accessCredentialId: 5998211
+                        referenceId: test@brivo.com
+                        updated: true
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '409':
+          description: Conflict, the attempted action is conflicted
+          content:
+            application/json:
+              examples:
+                '409 Error-Response:':
+                  value:
+                    code: 409
+                    message: There is already a pending invitation for the cardHolder. No new invitation will be generated
+        '412':
+          description: Precondition Failed, You don't have any Brivo Wallet Passes available.
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: You don't have any Brivo Wallet Passes available.
+  /users/{userId}/credentials/digital-invitations:
+    get:
+      operationId: ListUserDigitalInvitations
+      summary: List User Digital Invitations
+      description: Retrieve a listing of User Digital Invitations
+      tags:
+        - Digital_Invitations
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are  status  Filters based on
+            digital invitation status Allowed operators  eq: includes any digital invitation that falls under the
+            corresponding status   Allowed status values  pending: returns the listing of digital invitations which are
+            waiting to be redeemed by the user. redeemed: returns the listing of digital invitations which are redeemed
+            by the user. expired: returns the listing of digital invitations which past the expiration date but have not
+            been redeemed. cancelled: returns the listing of digital invitations which are cancelled by the user. all:
+            returns the listing of digital invitations with all the statuses above.      When no status filter is
+            provided, this endpoint defaults to pending.
+          schema:
+            type: string
+            x-apidoc-original-type: text
+        - name: userId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 791
+                        referenceId: john.doe@brivo.com
+                        accessCode: uQGg3Uyc
+                        created: '2016-01-25T15:48:52Z'
+                        expiration: '2016-01-28T15:48:52.339Z'
+                        status: EXPIRED
+                        nfcStatus: active
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid status provided
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    post:
+      operationId: CreateUserDigitalInvitation
+      summary: Create User Digital Invitation
+      description: >-
+        Create user digital invitation. Supported languages: English (en), French (fr), Spanish (es), Dutch (nl), German
+        (de), Swedish (sv)
+      tags:
+        - Digital_Invitations
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+        - name: sendInvitationEmail
+          in: query
+          required: true
+          description: Whether to send the email. Default is false.
+          schema:
+            type: boolean
+        - name: nfcEnabled
+          in: query
+          required: true
+          description: Whether to enable this invitation for use with NFC. Default is false.
+          schema:
+            type: boolean
+        - name: language
+          in: query
+          required: true
+          description: The language of the consent email that the user will receive. Default is en (English).
+          schema:
+            type: string
+            x-apidoc-original-type: Text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 740
+                    referenceId: john.doe@brivo.com
+                    credentialId: 967377
+                    accessCode: i9o7aR37
+                    created: '2016-01-20T14:59:36.345Z'
+                    expiration: '2016-01-23T14:59:36.345Z'
+                    status: PENDING
+                    nfcEnabled: false
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '409':
+          description: Conflict, the attempted action is conflicted
+          content:
+            application/json:
+              examples:
+                '409 Error-Response:':
+                  value:
+                    code: 409
+                    message: There is already a pending invitation for the cardHolder. No new invitation will be generated
+        '412':
+          description: Precondition Failed, You don't have any Brivo Wallet Passes available.
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: You don't have any Brivo Wallet Passes available.
+    delete:
+      operationId: Cancel_user_digital_invitation
+      summary: Cancel User Digital Invitation
+      description: Cancel a digital invitation associated with the user specified by the userId
+      tags:
+        - Digital_Invitations
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 740
+                    referenceId: john.doe@brivo.com
+                    credentialId: 967377
+                    accessCode: i9o7aR37
+                    created: '2016-01-25T15:41:11.920Z'
+                    expiration: '2016-01-28T15:41:11.920Z'
+                    status: CANCELLED
+                    nfcEnabled: false
+                    cancelDate: '2016-01-25T17:21:04.414Z'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Digital invitation not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

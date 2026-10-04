@@ -1,0 +1,24 @@
+{
+  "name": "brivo-velocity",
+  "version": "0.1.0",
+  "description": "MCP server exposing the Brivo Access Control API to Claude",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "package": "node scripts/build-exe.mjs",
+    "test:read-only": "node tests/brivo_access_read-only.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.0",
+    "dotenv": "^18.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6",
+    "typescript": "^7.0.2"
+  }
+}

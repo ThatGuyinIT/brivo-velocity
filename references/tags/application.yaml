@@ -1,0 +1,271 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Application endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging,
+    and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Application
+paths:
+  /applications:
+    get:
+      operationId: ApplicationList
+      summary: Application Listing
+      description: Provides a listing of the viewable applications associated with the account
+      tags:
+        - Application
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 431212
+                        accountId: 7444736
+                        name: Mobile One Administrative Application
+                        description: 3rd Party Administrative mobile application
+                        grantTypes:
+                          - password
+                          - authorization_code
+                          - refresh_token
+                        clientId: 4cd67df7-7b96-46ab-b289-b74ff11374a3
+                        secret: fv2pB8EWTm2QhLDwy0zAy3WfqT6xoSQl
+                        accessTokenTtl: 300
+                        refreshTokenTtl: 1209600
+                        created: '2015-08-01T21:33:34Z'
+                        updated: '2015-08-01T21:33:34Z'
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+    post:
+      operationId: ApplicationCreate
+      summary: Create New Application
+      description: >-
+        Create a new Application.
+
+
+        - In order to create an application that uses the 3-Legged work flow the "authorization_code" and
+        "refresh_token" Grant Types should be specified. If "authorization_code" is specified as a Grant Type then the
+        password grant cannot also be specified and a redirect URI must be specified correctly.
+
+        - If the "password" grant type is specified then the Application can only be used to access the owning Account
+        and no other. Also if the "password" Grant Type is specified then the "authorization_code" Grant Type cannot be
+        specified and the redirect URI field can be omitted.
+
+        - The Access Tokens are short lived as we are using JWT tokens which carry the Authentication, Application
+        information, User Principal, and expiration.
+
+        - If you wish to use our tokens as a valid authentication for your integration the the Tokens can be validated
+        by checking the signature using the certificate end point: GET https://auth.brivo.com/oauth/token_key.
+      tags:
+        - Application
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 2452345
+                    accountId: 502252
+                    name: clientApplicationName
+                    description: the clientAppDescription
+                    grantTypes:
+                      - password
+                      - refresh_token
+                      - authorization_code
+                    clientId: 4cd67df7-7b96-46ab-b289-b74ff11374a3
+                    secret: fv2pB8EWTm2QhLDwy0zAy3WfqT6xoSQl
+                    accessTokenTtl: 300
+                    refreshTokenTtl: 1209600
+                    created: '2015-08-01T21:33:34Z'
+                    updated: '2015-08-01T21:33:34Z'
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /applications/authorized:
+    get:
+      operationId: AuthorizedApplicationList
+      summary: Authorized Application Listing
+      description: >-
+        Provides a listing of the applications that have been authorized to take action against the account on an
+        administrators behalf
+      tags:
+        - Application
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - identity:
+                          id: 212121
+                          username: jean.luc
+                          firstName: Jean-Luc
+                          lastName: Picard
+                        applications:
+                          - name: Acme integrator app
+                            description: Acme corps integrator app for the arts
+                            clientId: 7955256f-b655-41d2-8f6e-02149400a664
+                          - name: User monitoring
+                            description: Custom user monitoring client application
+                            clientId: 54dcd4e0-7052-4492-bc3a-d92c65532a6d
+                    count: 1
+  /applications/{applicationId}:
+    get:
+      operationId: ApplicationGet
+      summary: Application Retrieval
+      description: Retrieves an Application by the provided id value
+      tags:
+        - Application
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 2452345
+                    accountId: 502252
+                    name: clientApplicationName
+                    description: the clientAppDescription
+                    grantTypes:
+                      - password
+                      - refresh_token
+                      - authorization_code
+                    clientId: 4cd67df7-7b96-46ab-b289-b74ff11374a3
+                    secret: fv2pB8EWTm2QhLDwy0zAy3WfqT6xoSQl
+                    accessTokenTtl: 300
+                    refreshTokenTtl: 1209600
+                    created: '2015-08-01T21:33:34Z'
+                    updated: '2015-08-01T21:33:34Z'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified application was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Application not found
+    delete:
+      operationId: DeleteApplication
+      summary: Delete Application
+      description: Delete Application
+      tags:
+        - Application
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified application was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Application not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

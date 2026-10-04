@@ -1,0 +1,538 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Schedule endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Schedule
+paths:
+  /schedules:
+    get:
+      operationId: List_Schedules
+      summary: Schedule Listing
+      description: |-
+        Retrieve a listing of schedules
+
+        - This action is only available to Brivo Account Config Tool Administrators
+        - Administrator must have access to a Site to retrieve schedules outside the Universal site
+      tags:
+        - Schedule
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are:  name  Filters based on
+            the schedule name Allowed operators:  eq: includes any schedule with a name that contains the provided name
+            value     enablingGroup  Filters based on the enabling group name Allowed operators:  eq: includes any
+            schedule with the enabling group name that contains the provided name value     site  Filters based on site
+            name. The site “Universal” may be used to filter schedules that apply to all sites. Allowed operators:  eq:
+            includes any schedule with the site name that contains the provided name value     editable  Filters based
+            on if the schedule is editable Allowed operators:  eq: includes any schedule with the editable attribute to
+            identify if it is true or false
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 44
+                        name: Office Schedule ABC
+                        editable: true
+                        siteName: Universal
+                      - id: 64
+                        name: 9 to 5 Office Schedule
+                        editable: true
+                        siteName: Brivo East
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+        '400':
+          description: Bad Request, the provided request contains an invalid filter
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    message: Invalid filter operator
+                    code: 400
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Access to the requested resource was denied
+  /schedules/:
+    post:
+      operationId: Create_Schedule
+      summary: Create Schedule
+      description: >-
+        Creates a schedule.
+
+
+        - This action is only available to Brivo Account Config Tool Administrators
+
+        - Assistant Administrators must have view and edit permissions to a site to create a site schedule, and will not
+        be able to create Universal schedules.
+      tags:
+        - Schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The schedule's name. Maximum 32 characters.
+                siteId:
+                  type: number
+                  description: The id of the site this schedule is associated to if a site schedule. Empty if not a site schedule.
+                enablingGroupId:
+                  type: number
+                  description: The id of the group that enables the schedule. Empty if not a group-enabled schedule.
+                gracePeriod:
+                  type: number
+                  description: >-
+                    Grace period for a group-enabled schedule. Empty if not a group-enabled schedule, otherwise valid
+                    values are 0-60.
+                scheduleBlocks:
+                  type: array
+                  items:
+                    type: string
+                    x-apidoc-original-type: ScheduleBlock
+                  description: >-
+                    The schedule blocks that define the overall schedule. Minimum one schedule block is needed and
+                    there's a maximum limit of 32 schedule time blocks per day.
+                scheduleExceptions:
+                  type: array
+                  items:
+                    type: string
+                    x-apidoc-original-type: ScheduleException
+                  description: >-
+                    The schedule exceptions that define the overall schedule exceptions in a schedule. There's a maximum
+                    limit of 16 schedule exceptions defined for a schedule.
+              required:
+                - name
+                - scheduleBlocks
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 498246
+                    name: Now Standard 9 to 5
+                    siteId: 468795
+                    siteName: Office
+                    enablingGroupId: 84686
+                    enablingGroupName: Desk Jockeys
+                    gracePeriod: 10
+                    scheduleBlocks:
+                      monday:
+                        - start: '09:00'
+                          end: '17:00'
+                      tuesday:
+                        - start: '09:00'
+                          end: '17:00'
+                      wednesday:
+                        - start: '09:00'
+                          end: '17:00'
+                      thursday:
+                        - start: '09:00'
+                          end: '17:00'
+                      friday:
+                        - start: '09:00'
+                          end: '17:00'
+                      saturday:
+                        - start: '08:30'
+                          end: '13:30'
+                      sunday:
+                        - start: '08:30'
+                          end: '13:30'
+                      holiday:
+                        - start: '08:30'
+                          end: '13:30'
+                    holidays: []
+                    scheduleExceptions:
+                      - enabling: DISABLE
+                        start: '00:00'
+                        end: '23:59'
+                        recurrence:
+                          type: DAY_OF_MONTH
+                          day: WEDNESDAY
+                          weekOfMonth: 2
+                      - enabling: ENABLE
+                        start: '05:00'
+                        end: '09:00'
+                        recurrence:
+                          type: SINGULAR
+                          date: '2022-03-19'
+        '400':
+          description: Bad Request, Invalid grace period
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: 'Invalid criteria provided: schedule name.'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Access to the requested resource was denied
+        '404':
+          description: Not Found, the requested resource was not found.
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: The requested resource was not found.
+  /schedules/{scheduleId}:
+    get:
+      operationId: Schedule_Retrieval
+      summary: Schedule Retrieval
+      description: |-
+        Retrieves a Schedule by the provided id value
+
+        - This action is only available to Brivo Account Config Tool Administrators
+        - Administrator must have access to a Site to retrieve schedules outside the Universal site
+      tags:
+        - Schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          description: The id associated with the schedule.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 498246
+                    name: Now Standard 9 to 5
+                    editable: true
+                    siteId: 468795
+                    siteName: Office
+                    enablingGroupId: 84686
+                    enablingGroupName: Desk Jockeys
+                    gracePeriod: 10
+                    scheduleBlocks:
+                      monday:
+                        - start: '09:00'
+                          end: '17:00'
+                      tuesday:
+                        - start: '09:00'
+                          end: '17:00'
+                      wednesday:
+                        - start: '09:00'
+                          end: '17:00'
+                      thursday:
+                        - start: '09:00'
+                          end: '17:00'
+                      friday:
+                        - start: '09:00'
+                          end: '17:00'
+                      saturday:
+                        - start: '08:30'
+                          end: '13:30'
+                      sunday:
+                        - start: '08:30'
+                          end: '13:30'
+                      holiday:
+                        - start: '08:30'
+                          end: '13:30'
+                    scheduleExceptions:
+                      - enabling: ENABLE
+                        start: '09:30'
+                        end: '10:30'
+                        recurrence:
+                          type: SINGULAR
+                          date: '2018-10-12'
+                      - enabling: DISABLE
+                        start: '12:00'
+                        end: '17:00'
+                        recurrence:
+                          type: DAY_OF_MONTH
+                          day: MONDAY
+                          weekOfMonth: 2
+                    holidays:
+                      - name: Halloween
+                        start: '2018-10-31T00:00:00'
+                        end: '2018-10-31T23:59:59'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Access to the requested resource was denied
+        '404':
+          description: Not Found, the requested resource was not found.
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: The requested resource was not found.
+    put:
+      operationId: Update_Schedule
+      summary: Update Schedule
+      description: >-
+        Updates a schedule.
+
+
+        - This action is only available to Brivo Account Config Tool Administrators
+
+        - Assistant Administrators must have view and edit permissions to a site to update a site schedule, and will not
+        be able to update Universal schedules.
+      tags:
+        - Schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          description: The id associated with the schedule.
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The schedule's name. Maximum 32 characters.
+                enablingGroupId:
+                  type: number
+                  description: The id of the group that enables the schedule. Empty if not a group-enabled schedule.
+                gracePeriod:
+                  type: number
+                  description: >-
+                    Grace period for a group-enabled schedule. Empty if not a group-enabled schedule, otherwise valid
+                    values are 0-60.
+                scheduleBlocks:
+                  type: array
+                  items:
+                    type: string
+                    x-apidoc-original-type: ScheduleBlock
+                  description: >-
+                    The schedule blocks that define the overall schedule. Minimum one schedule block is needed and
+                    there's a maximum limit of 32 schedule time blocks per day.
+                scheduleExceptions:
+                  type: array
+                  items:
+                    type: string
+                    x-apidoc-original-type: ScheduleException
+                  description: >-
+                    The schedule exceptions that define the overall schedule exceptions in a schedule. There's a maximum
+                    limit of 16 schedule exceptions defined for a schedule.
+              required:
+                - name
+                - scheduleBlocks
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 498246
+                    name: Now Standard 9 to 5
+                    siteId: 468795
+                    siteName: Office
+                    enablingGroupId: 84686
+                    enablingGroupName: Desk Jockeys
+                    gracePeriod: 10
+                    scheduleBlocks:
+                      monday:
+                        - start: '09:00'
+                          end: '17:00'
+                      tuesday:
+                        - start: '09:00'
+                          end: '17:00'
+                      wednesday:
+                        - start: '09:00'
+                          end: '17:00'
+                      thursday:
+                        - start: '09:00'
+                          end: '17:00'
+                      friday:
+                        - start: '09:00'
+                          end: '17:00'
+                      saturday:
+                        - start: '08:30'
+                          end: '13:30'
+                      sunday:
+                        - start: '08:30'
+                          end: '13:30'
+                      holiday:
+                        - start: '08:30'
+                          end: '13:30'
+                    scheduleExceptions:
+                      - enabling: DISABLE
+                        start: '00:00'
+                        end: '23:59'
+                        recurrence:
+                          type: DAY_OF_MONTH
+                          day: WEDNESDAY
+                          weekOfMonth: 2
+                      - enabling: ENABLE
+                        start: '05:00'
+                        end: '09:00'
+                        recurrence:
+                          type: SINGULAR
+                          date: '2022-03-19'
+        '400':
+          description: Bad Request, Invalid grace period
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: 'Invalid criteria provided: schedule name.'
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: This schedule cannot be edited or deleted
+        '404':
+          description: Not Found, the requested resource was not found.
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: The requested resource was not found.
+    delete:
+      operationId: Delete_Schedule
+      summary: Delete Schedule
+      description: >-
+        Deletes the schedule associated with the provided id
+
+
+        - This action is only available to Brivo Account Config Tool Administrators
+
+        - Assistant Administrators must have view and edit permissions to a site to delete a site schedule, and will not
+        be able to delete Universal schedules.
+
+        - Schedules that are associated with a group, device, and/or notification cannot be deleted until the
+        associations are cleared
+
+        - 24x7 Schedule and (Always Access) Schedule are auto created for the account and cannot be deleted or edited
+      tags:
+        - Schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          description: The id associated with the schedule
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Success example
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: This schedule cannot be edited or deleted
+        '404':
+          description: Not Found, the requested resource was not found.
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: The requested resource was not found.
+        '412':
+          description: Precondition Failed, the provided schedule has a dependent group access
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    code: 412
+                    message: 'Schedule in use by: notification(s)'
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

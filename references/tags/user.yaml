@@ -1,0 +1,1242 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – User endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and error
+    codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: User
+paths:
+  /batch/{jobId}:
+    get:
+      operationId: GetBatchJobStatus
+      summary: Get Batch Job Status
+      description: >-
+        Progress and per-user failures for a job queued by `POST /users/batch`. A job id that has not been picked up yet
+        - or one that never existed - reports `PENDING`. `errorProcessed` is always the full number of failures, but
+        `errors` lists at most 1000 of them; when it holds fewer than `errorProcessed`, `errorsTruncated` is `true` and
+        the remaining failures are not retrievable through this endpoint.
+      tags:
+        - User
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        default:
+          description: Default response
+  /users:
+    get:
+      operationId: ListUsers
+      summary: List Users
+      description: Retrieve a listing of Users
+      tags:
+        - User
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are   id  Filters based on
+            the user id. Multiple values can be comma separated Allowed operators  eq: includes any user from the user
+            ids provided ne: excludes any user from the user ids provided      firstname  Filters based on a user's
+            first name Allowed operators  eq: includes any user with a first name that contains the provided firstname
+            value      lastname  Filters based on a user's last name Allowed operators  eq: includes any user with a
+            last name that contains the provided lastname value      user_status  Filters based on a user's status
+            Allowed operators  eq: includes any user that falls under the corresponding status   Allowed user_status
+            values  active: returns users who have at least one active credential with an effective date range that
+            would include the current date, and be assigned to at least one group. unaffiliated: returns the listing of
+            users who are not assigned to a group. suspended: returns the listing of suspended users deleted
+            (deprecated): it is not supported anymore so it returns an empty result      cf_{customFieldId}  Filters
+            based on a specified custom field id  For example, a custom field with an id=1234 a filter would look like
+            cf_1234__eq:searchValue   Allowed operators  eq: Custom field types are taken into account during
+            filtering.  DATE values must be provided in the custom_field date pattern of the definition NUMBER values
+            will be matched on any exact field value TEXT values will return any field value that contains the requested
+            filter value   exact: Custom field types are taken into account during filtering.  DATE values must be
+            provided in the custom_field date pattern of the definition NUMBER values will be matched on any exact field
+            value TEXT values will return any field value that exactly matches the requested filter value
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 8784984
+                        firstName: John
+                        lastName: Doe
+                        created: '2023-04-11T01:35:12Z'
+                        updated: '2024-11-25T07:08:24Z'
+                        suspended: false
+                        bleTwoFactorExempt: false
+                        emails:
+                          - address: test@test.com
+                            type: Work
+                          - address: hometest@test.com
+                            type: Home
+                        phoneNumbers:
+                          - type: Work
+                            number: '1234567890'
+                          - type: Home
+                            number: '9876543210'
+                    offset: 0
+                    pageSize: 20
+                    count: 1
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+    post:
+      operationId: CreateUser
+      summary: Create new user
+      description: Create a new user
+      tags:
+        - User
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 442211
+                    externalId: Star Lord
+                    firstName: Peter
+                    middleName: Jason
+                    lastName: Quill
+                    pin: '5678'
+                    effectiveFrom: '2015-04-14T18:17:49Z'
+                    effectiveTo: '2020-12-31T23:59:59Z'
+                    suspended: false
+                    created: '2010-06-15T04:00:00Z'
+                    updated: '2018-03-14T04:00:00Z'
+                    bleTwoFactorExempt: true
+                    userImage:
+                      - id: 5678
+                        uri: http://aws.my.image.uri.com.net.stuff
+                    customFields:
+                      - id: 222
+                        fieldType: TEXT
+                        fieldName: species
+                        value: human
+                      - id: 233
+                        fieldType: DATE
+                        fieldName: Birth Date
+                        value: 02/04/1962
+                    emails:
+                      - address: peter.quill@brivo.com
+                        type: home
+                      - address: pquill7777@gmail.com
+                        type: work
+                    phoneNumbers:
+                      - number: (541) 754-3010
+                        type: home
+                      - number: +1-541-754-3010
+                        type: work
+                      - number: +49-89-636-48018
+                        type: other
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /users/batch:
+    post:
+      operationId: BatchAssignUsersToGroup
+      summary: Batch Assign Users to Group
+      description: >-
+        Queues a group membership change for up to 10000 users and returns a job id immediately. The work is applied
+        asynchronously, one user at a time, so a user that cannot be assigned costs only that user. Poll `GET
+        /batch/:jobId` for progress and per-user failures.
+
+
+        Only `ADD` is supported today; `REMOVE` and `REPLACE` are rejected with a 400.
+      tags:
+        - User
+      responses:
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '404':
+          description: Not Found, the specified group was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+  /users/{externalId}/external:
+    get:
+      operationId: RetrieveUserByExternal
+      summary: Retrieve by external id
+      description: Retrieves a User by their external id value
+      tags:
+        - User
+      parameters:
+        - name: externalId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                externalId:
+                  type: string
+                  x-apidoc-original-type: text
+                  description: The external id associated with the user
+              required:
+                - externalId
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 442211
+                    externalId: Star Lord
+                    firstName: Peter
+                    middleName: Jason
+                    lastName: Quill
+                    pin: '5678'
+                    effectiveFrom: '2015-04-14T18:17:49Z'
+                    effectiveTo: '2020-12-31T23:59:59Z'
+                    suspended: false
+                    created: '2010-06-15T04:00:00Z'
+                    updated: '2018-03-14T04:00:00Z'
+                    bleTwoFactorExempt: true
+                    userImage:
+                      - id: 5678
+                        uri: http://aws.my.image.uri.com.net.stuff
+                    customFields:
+                      - id: 222
+                        fieldType: TEXT
+                        fieldName: species
+                        value: human
+                      - id: 233
+                        fieldType: DATE
+                        fieldName: Birth Date
+                        value: 02/04/1962
+                    emails:
+                      - address: peter.quill@brivo.com
+                        type: home
+                      - address: pquill7777@gmail.com
+                        type: work
+                    phoneNumbers:
+                      - number: (541) 754-3010
+                        type: home
+                      - number: +1-541-754-3010
+                        type: work
+                      - number: +49-89-636-48018
+                        type: other
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{id}/custom-fields:
+    get:
+      operationId: ListUsersCustomFields
+      summary: List user's custom fields
+      description: List the custom field values associated with a user
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: number
+                  description: The Id of the user.
+              required:
+                - userId
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 2762
+                        fieldName: Department
+                        fieldType: TEXT
+                        value: Sales
+                      - id: 2763
+                        fieldName: ID
+                        fieldType: NUMBER
+                        value: '8675309'
+                      - id: 2347
+                        fieldName: Birth Date
+                        fieldType: DATE
+                        value: '1976-12-29'
+                      - id: 2348
+                        fieldName: Hire Date
+                        fieldType: DATE
+                        value: 10/10/2010
+                    count: 4
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{id}/groups:
+    post:
+      operationId: UpdateUsersGroups
+      summary: Update user's group memberships
+      description: >-
+        Simultaneously add or remove user's group memberships, or do both at once. Groups to be added will be skipped if
+        the user is already a member, and groups to be removed will be skipped if the user is not a member. A user can
+        be a member of at most 16 groups. If the user's total number of groups would exceed 16 after all removals and
+        additions are made, it is considered an error and no action will be taken. Note that this could also include
+        groups which the administrator does not have permission to view. Returns the updated list of user's group
+        memberships.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    count: 2
+                    data:
+                      - id: 76123
+                        name: Managers
+                      - id: 16632
+                        name: First Floor
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Group not found
+  /users/{userId}:
+    get:
+      operationId: RetrieveUser
+      summary: Retrieve by id
+      description: Retrieves a User by the provided id value
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 442211
+                    externalId: Star Lord
+                    firstName: Peter
+                    middleName: Jason
+                    lastName: Quill
+                    pin: '5678'
+                    effectiveFrom: '2015-04-14T18:17:49Z'
+                    effectiveTo: '2020-12-31T23:59:59Z'
+                    suspended: false
+                    created: '2010-06-15T04:00:00Z'
+                    updated: '2018-03-14T04:00:00Z'
+                    bleTwoFactorExempt: true
+                    userImage:
+                      - id: 5678
+                        uri: http://aws.my.image.uri.com.net.stuff
+                    customFields:
+                      - id: 222
+                        fieldType: TEXT
+                        fieldName: species
+                        value: human
+                      - id: 233
+                        fieldType: DATE
+                        fieldName: Birth Date
+                        value: 02/04/1962
+                    emails:
+                      - address: peter.quill@brivo.com
+                        type: home
+                      - address: pquill7777@gmail.com
+                        type: work
+                    phoneNumbers:
+                      - number: (541) 754-3010
+                        type: home
+                      - number: +1-541-754-3010
+                        type: work
+                      - number: +49-89-636-48018
+                        type: other
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    put:
+      operationId: UpdateUser
+      summary: Update user
+      description: |-
+        Update a user with the specified userId value.
+
+        Optional fields which are not included in the request body will have any existing value removed.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 442211
+                    externalId: Star Lord
+                    firstName: Peter
+                    middleName: Jason
+                    lastName: Quill
+                    pin: '5678'
+                    effectiveFrom: '2015-04-14T18:17:49Z'
+                    effectiveTo: '2020-12-31T23:59:59Z'
+                    suspended: false
+                    created: '2010-06-15T04:00:00Z'
+                    updated: '2018-03-14T04:00:00Z'
+                    bleTwoFactorExempt: true
+                    userImage:
+                      - id: 5678
+                        uri: http://aws.my.image.uri.com.net.stuff
+                    customFields:
+                      - id: 222
+                        fieldType: TEXT
+                        fieldName: species
+                        value: human
+                      - id: 233
+                        fieldType: DATE
+                        fieldName: Birth Date
+                        value: 02/04/1962
+                    emails:
+                      - address: peter.quill@brivo.com
+                        type: home
+                      - address: pquill7777@gmail.com
+                        type: work
+                    phoneNumbers:
+                      - number: (541) 754-3010
+                        type: home
+                      - number: +1-541-754-3010
+                        type: work
+                      - number: +49-89-636-48018
+                        type: other
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    delete:
+      operationId: Delete_User
+      summary: Delete User
+      description: Deletes a user specified by the provided userId
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    patch:
+      operationId: PatchUser
+      summary: Patch user
+      description: |-
+        Patch a user with the specified userId value.
+
+        Optional fields that are omitted from the request body will remain unchanged.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 442211
+                    externalId: Star Lord
+                    firstName: Changed Peter
+                    middleName: Jason
+                    lastName: Quill
+                    pin: '5678'
+                    effectiveFrom: '2015-04-14T18:17:49Z'
+                    effectiveTo: '2020-12-31T23:59:59Z'
+                    suspended: false
+                    created: '2010-06-15T04:00:00Z'
+                    updated: '2018-03-14T04:00:00Z'
+                    bleTwoFactorExempt: true
+                    userImage:
+                      - id: 5678
+                        uri: http://aws.my.image.uri.com.net.stuff
+                    customFields:
+                      - id: 222
+                        fieldType: TEXT
+                        fieldName: species
+                        value: human
+                      - id: 233
+                        fieldType: DATE
+                        fieldName: Birth Date
+                        value: 02/04/1962
+                    emails:
+                      - address: peter.quill@brivo.com
+                        type: home
+                      - address: pquill7777@gmail.com
+                        type: work
+                    phoneNumbers:
+                      - number: (541) 754-3010
+                        type: home
+                      - number: +1-541-754-3010
+                        type: work
+                      - number: +49-89-636-48018
+                        type: other
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{userId}/credentials:
+    get:
+      operationId: GetCredentialsForUser
+      summary: Retrieve Assigned Credentials
+      description: Retrieve user's credentials
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: number
+                  description: The Id of the user.
+              required:
+                - userId
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 38981
+                        credentialFormat:
+                          id: 100
+                          name: HID 26 bit Card
+                        referenceId: '329'
+                        encodedCredential: 28c0293
+                        fieldValues:
+                          - value: '329'
+                            credentialFieldId: 1
+                            name: acs.cards.format.card_number
+                          - value: '70'
+                            credentialFieldId: 2
+                            name: acs.cards.format.facility_code
+                        size: 26
+                        accountId: 5022
+                      - id: 611729
+                        credentialFormat:
+                          id: 2
+                          name: PIN Code
+                        encodedCredential: '23354'
+                        fieldValues: []
+                        size: 0
+                        accountId: 5022
+                        effectiveFrom: '2016-05-13T04:00:00Z'
+                    count: 2
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{userId}/credentials/{credentialId}:
+    put:
+      operationId: UserAssignCredential
+      summary: Assign Credential and Dates
+      description: Assigns a Credential to a User and sets the effective date range that the credential is valid for use.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: id associated with the user
+          schema:
+            type: number
+        - name: credentialId
+          in: path
+          required: true
+          description: id associated with the credential
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: The specified Credential was not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Credential not valid
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    delete:
+      operationId: RemoveCredentialFromUser
+      summary: Remove Credential from User
+      description: Revokes a particular credential from a user
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: id associated with the user
+          schema:
+            type: number
+        - name: credentialId
+          in: path
+          required: true
+          description: id associated with the credential
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{userId}/custom-fields/{customFieldId}:
+    put:
+      operationId: User_UpdateCustomField
+      summary: Update Custom Field Value
+      description: |-
+        Updates the value of the specified custom field id.
+
+        The value must be valid for the type definition of the custom field.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+        - name: customFieldId
+          in: path
+          required: true
+          description: The id associated with the custom field
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 54321
+                    fieldType: TEXT
+                    fieldName: Department
+                    value: Engineering
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    delete:
+      operationId: User_DeleteCustomField
+      summary: Delete Custom Field Value
+      description: Removes the value of the specified custom field id.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+        - name: customFieldId
+          in: path
+          required: true
+          description: The id associated with the custom field
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{userId}/groups:
+    get:
+      operationId: ListUsersGroups
+      summary: List user's groups
+      description: List the groups a user belongs to
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    count: 1
+                    data:
+                      - id: 76336
+                        name: Staff
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{userId}/photo:
+    get:
+      operationId: GetUserPhoto
+      summary: Get user photo
+      description: Retrieve a photo for a user
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User photo not found
+    post:
+      operationId: UploadUserPhoto
+      summary: Upload user photo
+      description: Upload a photo to a user
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Content-type header of multipart/form-data must be set and uploaded file is added
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+    delete:
+      operationId: Delete_user_photo
+      summary: Delete user photo
+      description: Deletes a photo associated with the user specified by the provided userId
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user/photo was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Attempting to remove user photo from unknown user
+  /users/{userId}/revoke-credentials:
+    post:
+      operationId: RevokeUserCredentials
+      summary: Revoke User Credentials
+      description: >-
+        Revokes all credentials assigned to the suspended user specified by the userId, excluding Facial ID (faceprint)
+        credentials. Brivo Mobile Pass credentials are unassigned and any digital invitation bound to them is cancelled.
+        The user must be suspended; otherwise a 400 error is returned.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful Response
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+  /users/{userId}/suspended:
+    get:
+      operationId: QuerySuspendedStatus
+      summary: Query suspended status
+      description: Retrieves the suspended status of a user specified by the provided userId
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 12345
+                    suspended: false
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+    put:
+      operationId: ToggleSuspendedStatus
+      summary: Toggle suspended status
+      description: >-
+        Updates the suspended status of a user specified by the provided userId to the suspended status in the request
+        body
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id associated with the user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 12345
+                    suspended: false
+        '400':
+          description: Bad Request, the provided request criteria are not valid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid criteria provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: User not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

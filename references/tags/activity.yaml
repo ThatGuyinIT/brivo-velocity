@@ -1,0 +1,131 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Activity endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and
+    error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Activity
+paths:
+  /activities:
+    get:
+      operationId: ListActivity
+      summary: Activity Listing
+      description: >-
+        **DEPRECATED - The /events (#api-Event-ListEvent) listing endpoint will now be the actively developed event
+        listing **
+
+
+        Retrieve a listing of activity events
+      tags:
+        - Activity
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Listed results will display beginning from the offset value.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The maximum number of records that will be returned for the call starting from the offset value.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are   site  Filter based on
+            the site id that an activity is associated with. Multiple id values can be passed by comma separating them.
+            Allowed operators  eq: includes any activity from the site ids provided      user  Filter based on the
+            entity id who is responsible for the activity Multiple id values can be passed by comma separating them.
+            Allowed operators  eq: includes any activity from the user ids provided      object  Filter based on the
+            object id that the activity is referencing Multiple id values can be passed by comma separating them Allowed
+            operators  eq: includes any activity from the object ids provided      device  Filter based on the device id
+            that the activity is referencing Multiple id values can be passed by comma separating them Allowed
+            operators  eq: includes any activity from the device ids provided      camera  Filter based on the camera id
+            that the activity is referencing Multiple id values can be passed by comma separating them Allowed
+            operators  eq: includes any activity from the camera ids provided      access-point  Filter based on the
+            access-point id that the activity is referencing Multiple id values can be passed by comma separating them
+            Allowed operators  eq: includes any activity from the access-point ids provided      event_type  Filter
+            based on the types of events specified by the provided event-types Multiple event-types can be provided by
+            comma separation Allowed operators  eq: includes activities from the provided event-types   Valid event
+            types  camera - events related to camera activities exception - events that occur outside of normal
+            operation such as unknown credentials non_exception - normal, expected events such as successful access
+            events      occurred  Filter based on the activity occurred time A maximum occurred window of 24 hours is
+            enforced Allowed operators  eq: Searches for activity events on the day specified, disregarding the time
+            values gt: Searches for events after a specified date and time value lt: Searches for events before a
+            specified date and time value   Providing both an occurred__gt and occurred__lt will allow specifying a
+            specific date range Providing only an occurred__gt filter will search for the 24 hours after the provided
+            date Providing only an occurred__lt filter will search for the 24 hours prior to the provided date
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: Success-Response
+          content:
+            application/json:
+              examples:
+                Success-Response:
+                  value:
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+                    data:
+                      - id: 11111111
+                        occurred: '2015-05-01T14:35:50Z'
+                        siteId: 9999
+                        siteName: Site 1
+                        userId: 333333
+                        objectId: 444444
+                        objectType: ACCESS-POINT
+                        objectName: Front door
+                        actionTypeId: 5018
+                        description: 'Failed Access by John Smith: Unauthorized Access Attempt'
+                      - id: 11112222
+                        occurred: '2015-04-30T20:07:59Z'
+                        siteId: 9999
+                        siteName: Site 1
+                        userId: 555555
+                        objectId: 777777
+                        objectType: ACCESS-POINT
+                        objectName: Side door
+                        actionTypeId: 2004
+                        description: User Entry
+        '400':
+          description: Bad Request, Invalid criteria were provided for the listing call
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

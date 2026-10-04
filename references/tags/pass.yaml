@@ -1,0 +1,59 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Pass endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and error
+    codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Pass
+paths:
+  /pass:
+    get:
+      operationId: GetPass
+      summary: Get Mobile Pass
+      description: Retrieve a Brivo Mobile Pass. Brivo Mobile Pass allows you to open doors with your smartphone.
+      tags:
+        - Pass
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value: "{\n   \"pass\": \"1234567890asdfgklQWERTYUIOPZXCVbnmASDFGh\",\n   \"bleCredential\": \"0931432asdfasd234134cxvxcsdfa12365468034\",\n   \"bleAuthTimeFrame\": 30,\n   \"enabled\": \"2018-10-26T04:00:00Z\",\n   \"accountName\": \"ABC Account\",\n   \"accountId\": 999999,\n   \"isGuest\": true,\n   \"sites\": [\n       {\n           \"id\": 123456,\n           \"siteName\": \"Site ABC\",\n           \"address\": {\n               \"streetAddress1\": \"4331 East West Hwy\",\n               \"streetAddress2\": \"301\",\n               \"city\": \"Bethesda\",\n               \"state\": \"MD\",\n               \"postalCode\": \"20814\"\n           },\n           \"timeZone\": \"US/Eastern\",\n           \"preScreening\": \"None\",\n           \"accessPoints\": [\n               {\n                   \"id\": 123789,\n                   \"name\": \"Main Lobby Entry\",\n                   \"type\": \"Door\",\n                   \"twoFactorEnabled\": false,\n                   \"schedules\": [\n                    {\n                     \t\"id\": 817129,\n                     \t\"name\": \"MondaySchedule\",\n                     \t\"description\": \"1\",\n                     \t\"scheduleBlocks\": {\n                        \t \"monday\": [\n                           \t\t  {\n                                \t\"start\": \"00:00\",\n                          \t       \t\"end\": \"23:59\"\n                           \t  }\n                         \t],\n                         \t\"holiday\": [\n                            \t {\n                                \t\"start\": \"00:00\",\n                                 \t\"end\": \"23:59\"\n                             \t}\n                         \t]\n                     \t},\n                     \t\"holidays\": [],\n                     \t\"scheduleExceptions\": []\n                    }\n             \t  ]\n             \t  \"isDoorStation\":false,\n             \t  \"isQrIntercom\":false\n               }\n           ]\n       },\n       {\n           \"id\": 123555,\n           \"siteName\": \"Site XYZ\",\n           \"address\": {\n               \"streetAddress1\": \"7700 Old Georgetown Road\",\n               \"streetAddress2\": \"\",\n               \"city\": \"Bethesda\",\n               \"state\": \"Maryland\",\n               \"postalCode\": \"20877\"\n             },\n           \"timeZone\": \"US/Eastern\",\n           \"preScreening\": \"Screen with Alert\",\n           \"accessPoints\": [\n               {\n                   \"id\": 123444,\n                   \"name\": \"Front Entry\",\n                   \"type\": \"Door\",\n                   \"twoFactorEnabled\": true,\n                   \"schedules\": [\n                    {\n                     \t\"id\": 817129,\n                     \t\"name\": \"MondaySchedule\",\n                     \t\"description\": \"1\",\n                     \t\"scheduleBlocks\": {\n                        \t \"monday\": [\n                           \t\t  {\n                                \t\"start\": \"00:00\",\n                          \t        \"end\": \"23:59\"\n                           \t  }\n                         \t],\n                         \t\"holiday\": [\n                            \t {\n                                \t\"start\": \"00:00\",\n                                 \t\"end\": \"23:59\"\n                             \t}\n                         \t]\n                     \t},\n                     \t\"holidays\": [],\n                     \t\"scheduleExceptions\": []\n                    }\n             \t  ]\n               }\n           ]\n       }\n    ],\n        \"firstName\": \"Peter\",\n        \"lastName\": \"Parker\",\n        \"middleName\": \"\",\n        \"userImage\": {\n            \"id\": 1234,\n            \"contentType\" : \"image/jpeg\",\n            \"userImageUri\": \"http://my.image.uri.com.net.stuff\",\n            \"contentLength\" : 62486,\n            \"created\" : \"2019-09-17T20:08:54Z\"\n        },\n    \"enablePassTransfer\" : true\n}"
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    error: access_denied
+                    error_description: Access is denied
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

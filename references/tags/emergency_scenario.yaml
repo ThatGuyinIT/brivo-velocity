@@ -1,0 +1,578 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Emergency_Scenario endpoints. See api-overview.md for base URLs, authentication, schema conventions,
+    paging, and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Emergency_Scenario
+paths:
+  /emergency-scenarios:
+    get:
+      operationId: getEmergencyScenariosList
+      summary: List emergency scenarios
+      description: Retrieve a listing of all emergency scenarios of type lockdown and egress.
+      tags:
+        - Emergency_Scenario
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The count of where to start the requested Page
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page, default size is 20 and max size is 100.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 7020884
+                        name: Lockdown scenario 1
+                        isDefault: false
+                        deviceIds:
+                          - 5648473
+                          - 5648605
+                        triggerIds: []
+                        created: '2024-01-30T06:36:05.302Z'
+                        updated: '2024-02-05T07:19:17.940Z'
+                        issued: null
+                        threatLevelTypeId: 2
+                      - id: 7030920
+                        name: Egress scenario 1
+                        isDefault: false
+                        deviceIds:
+                          - 5648473
+                          - 5648605
+                          - 5648606
+                        triggerIds: []
+                        created: '2024-01-30T06:36:05.302Z'
+                        updated: '2024-02-05T07:19:17.940Z'
+                        issued: '2024-02-06T06:22:41.158Z'
+                        threatLevelTypeId: 3
+                    offset: 0
+                    pageSize: 20
+                    count: 5
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /emergency-scenarios/active-scenarios:
+    get:
+      operationId: getActiveEmergencyScenariosList
+      summary: List active emergency scenarios
+      description: Retrieve a listing of all active emergency scenarios of type lockdown and egress.
+      tags:
+        - Emergency_Scenario
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The count of where to start the requested Page
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page, default size is 20 and max size is 100.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 7020884
+                        name: Lockdown scenario 1
+                        isDefault: false
+                        deviceIds:
+                          - 5648473
+                          - 5648605
+                        triggerIds: []
+                        created: '2024-01-30T06:36:05.302Z'
+                        updated: '2024-02-05T07:19:17.940Z'
+                        issued: null
+                        threatLevelTypeId: 2
+                      - id: 7030920
+                        name: Egress scenario 1
+                        isDefault: false
+                        deviceIds:
+                          - 5648473
+                          - 5648605
+                          - 5648606
+                        triggerIds: []
+                        created: '2024-01-30T06:36:05.302Z'
+                        updated: '2024-02-05T07:19:17.940Z'
+                        issued: '2024-02-06T06:22:41.158Z'
+                        threatLevelTypeId: 3
+                    offset: 0
+                    pageSize: 20
+                    count: 5
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /emergency-scenarios/clear-all:
+    post:
+      operationId: clearAllScenarios
+      summary: Clear All Emergency scenarios
+      description: >-
+        Clear all active emergency scenarios, including default full scenarios. Set all devices from your account back
+        to their normally operating state. OBS: does not consider common devices between scenarios!
+      tags:
+        - Emergency_Scenario
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    failedScenarios:
+                      - scenarioOid: 99999999
+                        name: Scenario 1
+                        reason: Failed to clear scenario 99999999 since all the devices failed to go under NORMAL
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Administrator 552345678 does not have permission to perform Clear All Scenarios
+  /emergency-scenarios/default-egress/clear:
+    post:
+      operationId: clearDefaultEgressScenario
+      summary: Clear Default Emergency Egress scenario
+      description: >-
+        Clear default emergency egress scenario. If an emergency egress scenario is set as default then will clear that
+        scenario. Else will clear default full egress scenario. Set all devices from your account from egress state back
+        to their normally operating state.
+      tags:
+        - Emergency_Scenario
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /emergency-scenarios/default-egress/initiate:
+    post:
+      operationId: initiateDefaultEgressScenario
+      summary: Initiate Default Emergency Egress scenario
+      description: >-
+        Initiate default emergency egress scenario. If an emergency egress scenario is set as default then will initiate
+        that scenario. Else will initiate default full egress scenario. Default Full egress scenario set all devices
+        from your account to an emergency egress state.
+      tags:
+        - Emergency_Scenario
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /emergency-scenarios/default-lockdown/clear:
+    post:
+      operationId: clearDefaultLockdownScenario
+      summary: Clear Default Emergency Lockdown scenario
+      description: >-
+        Clear default emergency lockdown scenario. If an emergency lockdown scenario is set as default then will clear
+        that scenario. Else it will clear the default full lockdown scenario. Set all of the doors from your account
+        from lockdown state back to their normally operating state.
+      tags:
+        - Emergency_Scenario
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /emergency-scenarios/default-lockdown/initiate:
+    post:
+      operationId: initiateDefaultLockdownScenario
+      summary: Initiate Default Emergency Lockdown scenario
+      description: >-
+        Initiate default emergency lockdown scenario. If an emergency lockdown scenario is set as the default, then this
+        endpoint will initiate that scenario. Else the default full lockdown scenario will be initiated. Default Full
+        Lockdown is available on every Access account and is a scenario that sets all of the doors in your account to an
+        emergency lockdown state.
+      tags:
+        - Emergency_Scenario
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /emergency-scenarios/egress/{scenarioId}/clear:
+    post:
+      operationId: clearEmergencyEgressScenario
+      summary: Clear Emergency Egress scenario
+      description: >-
+        Clear emergency egress scenario. Set all devices configured on a scenario from egress back to their normally
+        operating state.
+      tags:
+        - Emergency_Scenario
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: associated with the scenario which we want to clear
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Scenario {scenarioId} is not part of account {accountId}
+        '404':
+          description: Not Found, the specified emergency scenario of that type was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Scenario {scenarioId} of type {scenarioType} not found
+  /emergency-scenarios/egress/{scenarioId}/initiate:
+    post:
+      operationId: initiateEmergencyEgressScenario
+      summary: Initiate Emergency Egress scenario
+      description: Initiate an emergency egress scenario. Set all devices configured on a scenario to an emergency egress state.
+      tags:
+        - Emergency_Scenario
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: associated with the scenario which we want to initiate
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Scenario {scenarioId} is not part of account {accountId}
+        '404':
+          description: Not Found, the specified emergency scenario of that type was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Scenario {scenarioId} of type {scenarioType} not found
+  /emergency-scenarios/lockdown/{scenarioId}/clear:
+    post:
+      operationId: clearEmergencyLockdownScenario
+      summary: Clear Emergency Lockdown scenario
+      description: >-
+        Clear an emergency lockdown scenario. Set all devices configured on a scenario from lockdown back to their
+        normally operating state.
+      tags:
+        - Emergency_Scenario
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: associated with the scenario which we want to clear
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Scenario {scenarioId} is not part of account {accountId}
+        '404':
+          description: Not Found, the specified emergency scenario of that type was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Scenario {scenarioId} of type {scenarioType} not found
+  /emergency-scenarios/lockdown/{scenarioId}/initiate:
+    post:
+      operationId: initiateEmergencyLockdownScenario
+      summary: Initiate Emergency Lockdown scenario
+      description: Initiate emergency lockdown scenario. Set all devices configured on a scenario to an emergency lockdown state.
+      tags:
+        - Emergency_Scenario
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          description: associated with the scenario which we want to initiate
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    didAllFail: false
+                    devicesThatDidFail:
+                      - deviceOid: 333322
+                        name: Door 1
+                    scenarioOid: 9599012
+        '400':
+          description: Bad Request, Failed to initiate scenario
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Couldn't retrieve any devices as part of {scenarioId}
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: Scenario {scenarioId} is not part of account {accountId}
+        '404':
+          description: Not Found, the specified emergency scenario of that type was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Scenario {scenarioId} of type {scenarioType} not found
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

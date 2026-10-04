@@ -1,0 +1,587 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Administrator endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging,
+    and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Administrator
+paths:
+  /administrators:
+    get:
+      operationId: AdminList
+      summary: Administrator Listing
+      description: Retrieve a listing of administrators.
+      tags:
+        - Administrator
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: false
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api. Available filter criteria are   username  Filters based
+            on a administrator's username Allowed operators  eq: includes any administrators with a username that
+            contains the provided name value      type  Filter based on the type of administrators specified by the
+            provided type Allowed operators  eq: includes administrators from the provided type Valid type  csr - csr
+            administrators dealer - dealer administrators master - master administrators senior - senior administrators
+            assistant - assistant administrators
+          schema:
+            type: string
+            x-apidoc-original-type: text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 314761
+                        username: minasmythe
+                        firstName: Mina
+                        lastName: Smythe
+                        identityType: ASSISTANT
+                        email: mina.smythet@brivo.com
+                        timezone: US/Eastern
+                        canCreateAdmins: false
+                      - id: 314815
+                        username: johndoe
+                        firstName: John
+                        lastName: Doe
+                        identityType: ASSISTANT
+                        email: john.doe@brivo.com
+                        timezone: US/Central
+                        canCreateAdmins: false
+                    offset: 2
+                    pageSize: 2
+                    count: 42
+        '400':
+          description: Bad Request, Invalid criteria were provided for the listing call
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Invalid listing criteria provided
+    post:
+      operationId: AdminCreate
+      summary: Create Administrator
+      description: Create a new administrator
+      tags:
+        - Administrator
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 9876543210
+                    username: acme1357
+                    firstName: James
+                    middleName: Robert
+                    lastName: Miller
+                    identityType: SENIOR
+                    email: james.miller@acme.com
+                    timezone: US/Eastern
+                    canCreateAdmins: false
+        '400':
+          description: Bad Request, Invalid Admin username
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Not all required admin criteria was provided for creation
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /administrators/migrate/{administratorId}:
+    post:
+      operationId: MigrateAdmin
+      summary: Migrate Administrator to new permission model
+      description: Migrate an administrator to use the new permission model.
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: (Required) id associated with the administrator
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+  /administrators/username/check:
+    post:
+      operationId: CheckUsername
+      summary: Check Username
+      description: Check if a username is available
+      tags:
+        - Administrator
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    available: 'true'
+        '400':
+          description: Bad Request, Username not provided
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Username not provided
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+  /administrators/whoami:
+    get:
+      operationId: AdminWhoAmI
+      summary: Get Current Administrator
+      description: Return the administrator which the API calls are made on behalf of
+      tags:
+        - Administrator
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 9876543210
+                    username: acme1357
+                    firstName: James
+                    middleName: Robert
+                    lastName: Miller
+                    identityType: SENIOR
+                    email: james.miller@acme.com
+                    timezone: US/Eastern
+                    canCreateAdmins: false
+  /administrators/{administratorId}:
+    get:
+      operationId: RetrieveAdmin
+      summary: Administrator Retrieval
+      description: Retrieve an administrator based on its id
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: (Required) id associated with the administrator
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 1375988
+                    username: johnsmith2056
+                    firstName: John
+                    lastName: Smith
+                    identityType: SENIOR
+                    email: john.smigth@acme.com
+                    timezone: US/Mountain
+                    canCreateAdmins: false
+                    accountId: 111111
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+    put:
+      operationId: AdminUpdate
+      summary: Update Administrator
+      description: Update the administrator associated with the provided id value
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 9876543210
+                    username: acme1357
+                    firstName: James
+                    middleName: Robert
+                    lastName: Miller
+                    identityType: SENIOR
+                    email: james.miller@acme.com
+                    timezone: US/Eastern
+                    canCreateAdmins: false
+        '400':
+          description: Bad Request, Invalid Admin criteria
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Not all required admin criteria was provided for updating
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+    delete:
+      operationId: AdminDelete
+      summary: Delete Administrator
+      description: Delete the administrator associated with the provided id value
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+  /administrators/{administratorId}/login:
+    get:
+      operationId: RetrieveLogin
+      summary: Retrieve Login
+      description: Retrieve the login information associated with the Administrator
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    active: true
+                    locked: false
+                    temporaryPassword: true
+                    securityQuestion: What is your favorite color?
+                    retryCount: 3
+                    lastAttempted: 2016-10-16T18:14:128Z
+                    temporaryPasswordExpiration: 2016-10-16T22:14:128Z
+                    expiration: 2022-10-16T22:14:128Z
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+    post:
+      operationId: UpdateLogin
+      summary: Update Login
+      description: Updates the login status associated with the Administrator
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    active: true
+                    locked: false
+                    temporaryPassword: true
+                    securityQuestion: What is your favorite color?
+                    retryCount: 3
+                    lastAttempted: 2016-10-16T18:14:128Z
+                    temporaryPasswordExpiration: 2016-10-16T22:14:128Z
+                    expiration: 2022-10-16T22:14:128Z
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: You are not allowed to perform that action
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+  /administrators/{administratorId}/role/{roleId}:
+    post:
+      operationId: AddRole
+      summary: Add Role
+      description: Add role to the specified administrator.
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: The ID of the administrator which the role is to be assigned to
+          schema:
+            type: number
+        - name: roleId
+          in: path
+          required: true
+          description: The ID of the new role to be assigned to the administrator.
+          schema:
+            type: number
+      responses:
+        '201':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+    delete:
+      operationId: Administrator_DeleteRole
+      summary: Remove Role
+      description: Remove role from the specified administrator.
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: The ID of the administrator which the role will be removed from
+          schema:
+            type: number
+        - name: roleId
+          in: path
+          required: true
+          description: The ID of the role to be removed from the administrator.
+          schema:
+            type: number
+      responses:
+        '204':
+          description: Successful Response
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+  /administrators/{administratorId}/roles:
+    get:
+      operationId: GetAdminRoles
+      summary: Roles Listing for an Administrator
+      description: Retrieves all the roles assigned to the specified administrator.
+      tags:
+        - Administrator
+      parameters:
+        - name: administratorId
+          in: path
+          required: true
+          description: The ID of the administrator whose roles are returned
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 32732
+                        name: Role 1
+                        description: My Role
+                        roleType: CUSTOM
+                      - id: 2
+                        name: Super Administrator
+                        description: Can edit other administrators
+                        roleType: DEFAULT
+                    count: 2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+        '404':
+          description: Not Found, the specified user was not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: Administrator with id administratorId does not exist
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

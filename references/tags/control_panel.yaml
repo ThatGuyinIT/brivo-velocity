@@ -1,0 +1,238 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Control_Panel endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging,
+    and error codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Control_Panel
+paths:
+  /control-panels:
+    get:
+      operationId: ListControlPanels
+      summary: Get Control Panel Listing
+      description: Retrieve a listing of control panels which the current user has view permissions for.
+      tags:
+        - Control_Panel
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          description: The offset of values before returning the first result.
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          required: true
+          description: The number of records to return in a Page.
+          schema:
+            type: number
+        - name: filter
+          in: query
+          required: false
+          description: >-
+            Filters follow the common filter format for the api.  Available filter criteria are   status  Filters based
+            on a control panel's status Allowed operators  eq: includes any control panel that falls under the
+            corresponding status   Allowed status values  connected: returns control panels that are connected.
+            disconnected: returns control panels that are disconnected.
+          schema:
+            type: string
+            x-apidoc-original-type: Text
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    offset: 0
+                    pageSize: 20
+                    count: 2
+                    data:
+                      - id: 271622
+                        panelName: cp7946804
+                        serialNumber: CP7946804
+                        activated: '2015-03-25T04:00:00Z'
+                        updated: '2015-07-09T04:00:00Z'
+                        lastContact: '2015-07-13T16:33:55Z'
+                        firmwareVersion: 5.0.19
+                        panelType: IRIS V5.0
+                        status: CONNECTED
+                      - id: 221314
+                        panelName: TestCP
+                        serialNumber: CP462088
+                        activated: '2013-07-10T04:00:00Z'
+                        updated: '2015-07-09T04:00:00Z'
+                        lastContact: '2015-07-13T16:33:55Z'
+                        firmwareVersion: 5.0.20
+                        panelType: IRIS V5.0
+                        status: CONNECTED
+        '400':
+          description: Bad Request, the provided criteria is invalid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    message: Invalid criteria provided
+                    code: 400
+  /control-panels/{controlPanelId}:
+    get:
+      operationId: RetrieveControlPanel
+      summary: Get Control Panel by id
+      description: Retrieve a Control Panel by the given id value.
+      tags:
+        - Control_Panel
+      parameters:
+        - name: controlPanelId
+          in: path
+          required: true
+          description: the id associated with the Control Panel
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 271622
+                    panelName: cp7946804
+                    serialNumber: CP7946804
+                    activated: '2015-03-25T04:00:00Z'
+                    updated: '2015-07-09T04:00:00Z'
+                    lastContact: '2015-07-13T16:33:55Z'
+                    firmwareVersion: 5.0.19
+                    panelType: IRIS V5.0
+                    status: CONNECTED
+        '404':
+          description: Not Found, the provided Control Panel is not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    message: Requested control panel not found
+                    code: 404
+  /control-panels/{controlPanelId}/firmware:
+    get:
+      operationId: ControlPanelFirmwareGet
+      summary: Get Control Panel firmware
+      description: Retrieve the panel's current firmware and a listing of available firmwares for the specified Control Panel
+      tags:
+        - Control_Panel
+      parameters:
+        - name: controlPanelId
+          in: path
+          required: true
+          description: the id associated with the Control Panel
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    firmwareVersion: 5.0.0
+                    availableVersions:
+                      - 5.0.0
+                      - 5.1.0
+                      - 5.1.1b
+                      - 5.2.0
+                      - 5.2.1
+        '404':
+          description: Not Found, the provided Control Panel is not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    message: Requested control panel not found
+                    code: 404
+    post:
+      operationId: ControlPanelFirmwareUpdate
+      summary: Update Control Panel firmware
+      description: Update the firmware of a specified Control Panel
+      tags:
+        - Control_Panel
+      parameters:
+        - name: controlPanelId
+          in: path
+          required: true
+          description: The id associated with the Control Panel
+          schema:
+            type: number
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    firmwareVersion: 5.0.0
+                    availableVersions:
+                      - 5.0.0
+                      - 5.1.0
+                      - 5.1.1b
+                      - 5.2.0
+                      - 5.2.1
+        '400':
+          description: Bad Request, the provided criteria is invalid
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    message: Invalid criteria provided
+                    code: 400
+        '404':
+          description: Not Found, the provided Control Panel is not found
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    message: Requested control panel not found
+                    code: 404
+        '412':
+          description: Precondition Failed, the provided Control Panel is not connected
+          content:
+            application/json:
+              examples:
+                '412 Error-Response:':
+                  value:
+                    message: Requested control panel is not connected
+                    code: 412
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}

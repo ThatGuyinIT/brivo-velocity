@@ -1,0 +1,369 @@
+openapi: 3.1.0
+info:
+  title: Brivo API
+  version: 1.0.0
+  description: >-
+    Brivo API – Role endpoints. See api-overview.md for base URLs, authentication, schema conventions, paging, and error
+    codes.
+servers:
+  - url: https://api.brivo.com/v1/api
+security:
+  - oauth2: []
+    apiKey: []
+externalDocs:
+  description: API conventions and authentication
+  url: https://apidocs.brivo.com/access/api-overview.md
+tags:
+  - name: Role
+paths:
+  /roles:
+    get:
+      operationId: getRoles
+      summary: Roles Listing
+      description: Retrieves all the roles for the account.
+      tags:
+        - Role
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    data:
+                      - id: 32732
+                        name: Role 1
+                        description: My Role
+                        roleType: CUSTOM
+                      - id: 2
+                        name: Super Administrator
+                        description: Can edit other administrators
+                        roleType: DEFAULT
+                    count: 2
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+    post:
+      operationId: CreateRole
+      summary: Create Role
+      description: Creates a role.
+      tags:
+        - Role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The name of the role.
+                description:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The description of the role.
+                features:
+                  type: array
+                  items:
+                    type: string
+                    x-apidoc-original-type: Feature
+                  description: The features associated with the role.
+              required:
+                - name
+                - description
+                - features
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 32745
+                    name: Dillan.Smitham95
+                    description: x
+                    roleType: CUSTOM
+                    features:
+                      - id: 30
+                        key: ONAIR_CLASSIC
+                        displayOrder: 1
+                        applicationId: 1
+                        permissionSet: FULL
+                        permissions:
+                          - id: 38
+                            key: ONAIR_CLASSIC
+                            limited: true
+                            hasPermission: true
+                            dependencies: []
+                      - id: 26
+                        key: GLOBAL_VIEW
+                        displayOrder: 2
+                        applicationId: 1
+                        permissionSet: FULL
+                        permissions:
+                          - id: 30
+                            key: GLOBAL_VIEW
+                            limited: false
+                            hasPermission: true
+                            dependencies: []
+                      - id: 13
+                        key: EVT_TRACKER_TABLE
+                        displayOrder: 4
+                        applicationId: 1
+                        permissionSet: NONE
+                        permissions:
+                          - id: 35
+                            key: EVT_TRACKER_TABLE
+                            limited: true
+                            hasPermission: false
+                            dependencies: []
+                      - id: 28
+                        key: EVT_CLASSIFICATION
+                        displayOrder: 8
+                        applicationId: 1
+                        permissionSet: CUSTOM
+                        permissions:
+                          - id: 32
+                            key: EVT_CLASSIFICATION_VIEW
+                            limited: true
+                            hasPermission: true
+                            dependencies: []
+                          - id: 33
+                            key: EVT_CLASSIFICATION_EDIT
+                            limited: false
+                            hasPermission: false
+                            dependencies: []
+        '400':
+          description: Bad Request, Role name is missing
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Permissions are not allowed when using FULL or LIMITED feature set.
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+        '409':
+          description: Bad Request, Role name already exists.
+          content:
+            application/json:
+              examples:
+                '409 Error-Response:':
+                  value:
+                    code: 409
+                    message: Role name already exists for the account.
+  /roles/{roleId}:
+    put:
+      operationId: UpdateRole
+      summary: Update Role
+      description: Updates a role.
+      tags:
+        - Role
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The new name of the role.
+                description:
+                  type: string
+                  x-apidoc-original-type: Text
+                  description: The new description of the role.
+                features:
+                  type: array
+                  items:
+                    type: string
+                    x-apidoc-original-type: Feature
+                  description: The new features associated with the role.
+              required:
+                - name
+                - description
+                - features
+      responses:
+        '200':
+          description: 'Success-Response:'
+          content:
+            application/json:
+              examples:
+                'Success-Response:':
+                  value:
+                    id: 32745
+                    name: Dillan.Smitham95
+                    description: x
+                    roleType: CUSTOM
+                    features:
+                      - id: 30
+                        key: ONAIR_CLASSIC
+                        displayOrder: 1
+                        applicationId: 1
+                        permissionSet: FULL
+                        permissions:
+                          - id: 38
+                            key: ONAIR_CLASSIC
+                            limited: true
+                            hasPermission: true
+                            dependencies: []
+                      - id: 26
+                        key: GLOBAL_VIEW
+                        displayOrder: 2
+                        applicationId: 1
+                        permissionSet: FULL
+                        permissions:
+                          - id: 30
+                            key: GLOBAL_VIEW
+                            limited: false
+                            hasPermission: true
+                            dependencies: []
+                      - id: 13
+                        key: EVT_TRACKER_TABLE
+                        displayOrder: 4
+                        applicationId: 1
+                        permissionSet: NONE
+                        permissions:
+                          - id: 35
+                            key: EVT_TRACKER_TABLE
+                            limited: true
+                            hasPermission: false
+                            dependencies: []
+                      - id: 28
+                        key: EVT_CLASSIFICATION
+                        displayOrder: 8
+                        applicationId: 1
+                        permissionSet: CUSTOM
+                        permissions:
+                          - id: 32
+                            key: EVT_CLASSIFICATION_VIEW
+                            limited: true
+                            hasPermission: true
+                            dependencies: []
+                          - id: 33
+                            key: EVT_CLASSIFICATION_EDIT
+                            limited: false
+                            hasPermission: false
+                            dependencies: []
+        '400':
+          description: Bad Request, Role name is missing
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Permissions are not allowed when using FULL or LIMITED feature set.
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+        '404':
+          description: Not Found, The requested role Id doesn't exist.
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: The requested role Id doesn't exist.
+        '409':
+          description: Bad Request, Role name already exists.
+          content:
+            application/json:
+              examples:
+                '409 Error-Response:':
+                  value:
+                    code: 409
+                    message: Role name already exists for the account.
+    delete:
+      operationId: Role_DeleteRole
+      summary: Delete Role
+      description: Deletes a role.
+      tags:
+        - Role
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          description: (Required) The ID of the role to delete.
+          schema:
+            type: number
+      responses:
+        '204':
+          description: 'Success-Response:'
+        '400':
+          description: Bad Request, Default or service roles cannot be deleted.
+          content:
+            application/json:
+              examples:
+                '400 Error-Response:':
+                  value:
+                    code: 400
+                    message: Default or service roles cannot be deleted.
+        '403':
+          description: Forbidden, the attempted action is forbidden
+          content:
+            application/json:
+              examples:
+                '403 Error-Response:':
+                  value:
+                    code: 403
+                    message: User unauthorized
+        '404':
+          description: Not Found, The requested role Id doesn't exist.
+          content:
+            application/json:
+              examples:
+                '404 Error-Response:':
+                  value:
+                    code: 404
+                    message: The requested role Id doesn't exist.
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: Mashery API key obtained from developer.brivo.com
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.brivo.com/oauth/authorize
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
+        password:
+          tokenUrl: https://auth.brivo.com/oauth/token
+          scopes: {}
