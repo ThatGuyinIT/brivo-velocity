@@ -22,10 +22,21 @@ jobs:
       - run: npm run build
       - run: npm run package
 
+      - name: Rename binary for release (brivo-velocity-<version>-<platform>-<arch>)
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          arch=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            name="brivo-velocity-${version}-windows-${arch}.exe"
+            cp dist/brivo-velocity.exe "dist/${name}"
+          else
+            name="brivo-velocity-${version}-macos-${arch}"
+            cp dist/brivo-velocity "dist/${name}"
+          fi
+          echo "ASSET_NAME=${name}" >> "$GITHUB_ENV"
+
       - uses: actions/upload-artifact@v4
         with:
-          name: brivo-velocity-${{ matrix.os }}
-          path: |
-            dist/brivo-velocity.exe
-            dist/brivo-velocity
-          if-no-files-found: ignore
+          name: ${{ env.ASSET_NAME }}
+          path: dist/${{ env.ASSET_NAME }}
