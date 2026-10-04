@@ -1,4 +1,4 @@
-# brivo-velocity
+# Brivo Velocity
 
 An MCP ([Model Context Protocol](https://modelcontextprotocol.io)) server that gives Claude read-only access to the [Brivo Access Control API](https://www.brivo.com/) — sites, access points, control panels, users, credentials, schedules, cameras, and more.
 
