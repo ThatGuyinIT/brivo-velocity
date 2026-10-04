@@ -17,7 +17,7 @@ Windows and macOS are both built and verified via CI on real `windows-latest`/`m
 
 ## Setup
 
-1. Download the latest binary for your platform from [Releases](https://github.com/ThatGuyinIT/brivo-velocity/releases) (`brivo-velocity.exe` for Windows, `brivo-velocity` for macOS) and put it somewhere permanent, e.g. alongside any other local MCP servers you run.
+1. Download the latest binary for your platform from [Releases](https://github.com/ThatGuyinIT/brivo-velocity/releases) (`brivo-velocity-<version>-windows-x64.exe` for Windows, `brivo-velocity-<version>-macos-arm64` for macOS) and put it somewhere permanent, e.g. alongside any other local MCP servers you run.
 2. Run it once, or just add it to Claude Desktop's config and launch Claude — it creates a `brivo-velocity.env` file next to itself with blank placeholders on first run.
 3. Fill in `brivo-velocity.env` with your own Brivo credentials. If any value contains a `#`, wrap it in double quotes (e.g. `BRIVO_PASSWORD="my#password"`) — otherwise everything after the `#` is silently dropped as a comment.
 4. Add it to Claude Desktop's MCP config (`claude_desktop_config.json`):
